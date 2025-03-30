@@ -14,13 +14,14 @@ LuckyMilkTea is a comprehensive management system designed for milk tea shops. I
 
 ### 1. Clone the Repository  
 ```
-git clone https://github.com/yourusername/LuckyMilkTea.git  
+git clone https://github.com/annguyenbinh03/LuckyMilkTea.git  
 cd LuckyMilkTea  
 ```
 2. Configure Environment
+3. 
 Set up appsettings.json with your database connection string.
 
-3. Run the Application
+4. Run the Application
 ```
 dotnet run  
 ```
