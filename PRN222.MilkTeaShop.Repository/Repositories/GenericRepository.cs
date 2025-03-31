@@ -117,7 +117,7 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
             return await _dbSet.CountAsync();
         }
 
-        private string GetPropertyName<T, TProperty>(Expression<Func<T, TProperty>> expression)
+        private string GetPropertyName<TProperty>(Expression<Func<T, TProperty>> expression)
         {
             if (expression.Body is MemberExpression memberExpression)
             {

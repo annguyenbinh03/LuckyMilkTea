@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using PRN222.MilkTeaShop.Repository.DbContexts;
+using PRN222.MilkTeaShop.Repository.Repositories;
+
 namespace PRN222.MilkTeaShop.Manager
 {
     public class Program
@@ -8,6 +12,11 @@ namespace PRN222.MilkTeaShop.Manager
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+
+            builder.Services.AddDbContext<MilkTeaDBContext>(options =>
+                    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped(typeof(GenericRepository<>));
 
             var app = builder.Build();
 
