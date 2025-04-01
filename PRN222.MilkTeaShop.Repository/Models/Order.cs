@@ -11,13 +11,20 @@ public partial class Order
 
     public decimal TotalPrice { get; set; }
 
-    public string Status { get; set; }
-
-    public DateTime? CreatedAt { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
+    public string Status { get; set; } = "pending";
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+    public void UpdateStatus(string newStatus)
+    {
+        if (newStatus == "pending" || newStatus == "completed" || newStatus == "cancelled")
+        {
+            Status = newStatus;
+            UpdatedAt = DateTime.Now;
+        }
+    }
 }

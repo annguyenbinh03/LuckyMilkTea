@@ -1,0 +1,34 @@
+﻿@page
+@model PRN222.MilkTeaShop.Staff.Pages.Orders.IndexModel
+@{
+    ViewData["Title"] = "Orders List";
+}
+
+<h2>Orders List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model.Orders)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.TotalPrice</td>
+                <td>@order.Status</td>
+                <td>@order.CreatedAt</td>
+                <td>
+                    <a href="/Orders/Update?id=@order.Id" class="btn btn-warning">Edit</a>
+                    <a href="/Payments/Create?orderId=@order.Id" class="btn btn-success">Create Payment</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -10,8 +10,4 @@
     <ProjectReference Include="..\PRN222.MilkTeaShop.Repository\PRN222.MilkTeaShop.Repository.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>

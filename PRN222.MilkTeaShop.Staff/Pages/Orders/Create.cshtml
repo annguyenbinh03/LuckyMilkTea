@@ -1,0 +1,28 @@
+﻿@page
+@model PRN222.MilkTeaShop.Staff.Pages.Orders.CreateModel
+@{
+    ViewData["Title"] = "Create New Order";
+}
+
+<h2>Create New Order</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="TotalPrice">Total Price</label>
+        <input type="text" class="form-control" id="TotalPrice" name="Order.TotalPrice" />
+    </div>
+
+    <div class="form-group">
+        <label for="OrderStatus">Status</label>
+        <select class="form-control" id="OrderStatus" name="Order.Status">
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Create Order</button>
+    </div>
+</form>
+
