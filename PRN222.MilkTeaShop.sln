@@ -10,6 +10,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222.MilkTeaShop.Service", "PRN222.MilkTeaShop.Service\PRN222.MilkTeaShop.Service.csproj", "{8D9B1A5B-ADEB-4409-8847-E69E10D0A8D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222.MilkTeaShop.Staff", "PRN222.MilkTeaShop.Staff\PRN222.MilkTeaShop.Staff.csproj", "{E3358F3D-B134-442A-829E-BDC48157065D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222.LuckyMilkTea.BlazorWebApp", "PRN222.LuckyMilkTea.BlazorWebApp\PRN222.LuckyMilkTea.BlazorWebApp.csproj", "{860C2535-C1FA-40C5-86E6-5EDAF3576C05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +34,10 @@ Global
 		{E3358F3D-B134-442A-829E-BDC48157065D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3358F3D-B134-442A-829E-BDC48157065D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3358F3D-B134-442A-829E-BDC48157065D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{860C2535-C1FA-40C5-86E6-5EDAF3576C05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{860C2535-C1FA-40C5-86E6-5EDAF3576C05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{860C2535-C1FA-40C5-86E6-5EDAF3576C05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{860C2535-C1FA-40C5-86E6-5EDAF3576C05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
