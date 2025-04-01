@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Tea Shop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/manager/layout.css" />
+</head>
+<body>
+    <div class="admin-container">
+        <nav class="admin-sidebar">
+            <h3>Lucky Milk Tea</h3>
+            <ul>
+                <li><a asp-page="/Manager/Dashboard/Index">Dashboard</a></li>
+                <li><a asp-page="/Manager/Products/Index">Quản lý loại sản phẩm</a></li>
+                <li><a asp-page="/Manager/Products/Index">Quản lý sản phẩm</a></li>
+                <li><a asp-page="/Index">Quản lý nhân viên</a></li>
+                <li><a asp-page="/Index">Quản lý hóa đơn</a></li>
+            </ul>
+        </nav>
+        <div class="admin-content">
+            <div class="header d-flex justify-content-between align-items-center px-4">
+                <div class="fs-3 fw-bold">@ViewData["HeaderTitle"]</div>
+                <button class="btn btn-danger">Logout</button>
+            </div>
+            <main >
+                
+                @RenderBody()
+            </main>
+        </div>
+       
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

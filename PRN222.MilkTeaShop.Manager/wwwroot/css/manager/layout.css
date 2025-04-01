@@ -1,0 +1,89 @@
+﻿/* General Body Styles */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern, clean font */
+    background-color: #f8f9fa; /* Light background for overall feel */
+    color: #333; /* Darker text for better readability */
+}
+
+/* Admin Container (Flexbox Layout) */
+.admin-container {
+    display: flex;
+    min-height: 100vh; /* Full viewport height */
+}
+
+/* Admin Content Area */
+.admin-content {
+    flex-grow: 1; /* Takes up remaining space */
+    background-color: #fff; /* White background for content */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.admin-content main{
+    padding: 20px;
+}
+
+    .admin-content .header {
+        padding: 10px;
+        border-bottom: 1px solid black;
+    }
+
+/* Admin Sidebar */
+.admin-sidebar {
+    width: 280px; /* Slightly wider sidebar */
+    background: #343a40; /* Dark background color */
+    color: white;
+    padding: 30px; /* Increased padding */
+    border-right: 1px solid #555; /* Changed to border-right for visual consistency */
+}
+
+    /* Sidebar Heading */
+    .admin-sidebar h3 {
+        margin-bottom: 25px; /* Increased margin */
+        font-size: 1.5em; /* Larger heading */
+        font-weight: 600; /* Semi-bold */
+        text-transform: uppercase; /* Uppercase heading */
+        letter-spacing: 1px; /* Subtle letter spacing */
+    }
+
+    /* Sidebar List */
+    .admin-sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+        /* Sidebar List Items */
+        .admin-sidebar ul li {
+            margin-bottom: 15px; /* Increased margin */
+        }
+
+            /* Sidebar Links */
+            .admin-sidebar ul li a {
+                color: white;
+                text-decoration: none;
+                display: block;
+                padding: 12px 15px; /* Adjusted padding */
+                border-radius: 8px; /* Rounded corners */
+                transition: background-color 0.2s ease; /* Smooth hover transition */
+            }
+
+                /* Sidebar Link Hover Effect */
+                .admin-sidebar ul li a:hover {
+                    background: #495057;
+                }
+
+/* Specific Content Styles (Example: Dashboard) */
+h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #212529; /* Darker heading color */
+}
+
+p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: #495057;
+}
+
