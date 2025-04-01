@@ -16,10 +16,11 @@ namespace PRN222.MilkTeaShop.Repository.UnitOfWork
         IGenericRepository<OrderDetail> OrderDetail { get; }
         IGenericRepository<Payment> Payment { get; }
         IGenericRepository<PaymentMethod> PaymentMethod { get; }
-        IGenericRepository<Product> Product { get; }
+        IProductRepository Product { get; }
         IGenericRepository<ProductCombo> ProductCombo { get; }
         IGenericRepository<ProductSize> ProductSize { get; }
-        IGenericRepository<Size> Size { get; }
+        ISizeRepository Size { get; }
+
         Task SaveChanges();
     }
 }

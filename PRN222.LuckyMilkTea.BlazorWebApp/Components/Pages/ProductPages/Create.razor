@@ -1,0 +1,164 @@
+﻿@page "/order"
+
+<PageTitle>Order Food</PageTitle>
+
+<h1>Order Food</h1>
+
+<button class="btn btn-primary" @onclick="ShowModal">Order Food</button>
+
+@if (showModal)
+{
+    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Trà sữa loading...</h5>
+                    <button type="button" class="btn-close" @onclick="HideModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" alt="Product Image" style="width: 50px; height: 50px; margin-right: 10px;">
+                        <div>
+                            ...đ ...đ
+                            <p class="text-muted small">Chưa có thông tin.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-start mb-3">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="DecreaseQuantity">-</button>
+                        <span class="mx-2">@quantity</span>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" @onclick="IncreaseQuantity">+</button>
+                        <button type="button" class="btn btn-warning btn-sm ms-3">+ 25,000đ</button> @* Example Add-on button *@
+                    </div>
+
+                    <div class="accordion" id="foodOptions">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingLoai">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoai" aria-expanded="true" aria-controls="collapseLoai">
+                                    Chọn loại
+                                </button>
+                            </h2>
+                            <div id="collapseLoai" class="accordion-collapse collapse show" aria-labelledby="headingLoai" data-bs-parent="#foodOptions">
+                                <div class="accordion-body">
+                                    <!-- Content for Chọn loại options -->
+                                    <p>Chọn loại content here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingSizeM">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSizeM" aria-expanded="false" aria-controls="collapseSizeM">
+                                    Chọn món size M
+                                </button>
+                            </h2>
+                            <div id="collapseSizeM" class="accordion-collapse collapse" aria-labelledby="headingSizeM" data-bs-parent="#foodOptions">
+                                <div class="accordion-body">
+                                    <!-- Content for Chọn món size M options -->
+                                    <p>Chọn món size M content here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingSizeL">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSizeL" aria-expanded="false" aria-controls="collapseSizeL">
+                                    Chọn món size L
+                                </button>
+                            </h2>
+                            <div id="collapseSizeL" class="accordion-collapse collapse" aria-labelledby="headingSizeL" data-bs-parent="#foodOptions">
+                                <div class="accordion-body">
+                                    <!-- Content for Chọn món size L options -->
+                                    <p>Chọn món size L content here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingSize">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSize" aria-expanded="false" aria-controls="collapseSize">
+                                    Chọn size
+                                </button>
+                            </h2>
+                            <div id="collapseSize" class="accordion-collapse collapse" aria-labelledby="headingSize" data-bs-parent="#foodOptions">
+                                <div class="accordion-body">
+                                    <!-- Content for Chọn size options -->
+                                    <p>Chọn size content here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingDuong">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDuong" aria-expanded="false" aria-controls="collapseDuong">
+                                    Chọn đường
+                                </button>
+                            </h2>
+                            <div id="collapseDuong" class="accordion-collapse collapse" aria-labelledby="headingDuong" data-bs-parent="#foodOptions">
+                                <div class="accordion-body">
+                                    <!-- Content for Chọn đường options -->
+                                    <p>Chọn đường content here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingDa">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDa" aria-expanded="false" aria-controls="collapseDa">
+                                    Chọn đá
+                                </button>
+                            </h2>
+                            <div id="collapseDa" class="accordion-collapse collapse" aria-labelledby="headingDa" data-bs-parent="#foodOptions">
+                                <div class="accordion-body">
+                                    <!-- Content for Chọn đá options -->
+                                    <p>Chọn đá content here.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingNote">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNote" aria-expanded="false" aria-controls="collapseNote">
+                                    -  -
+                                </button>
+                            </h2>
+                            <div id="collapseNote" class="accordion-collapse collapse" aria-labelledby="headingNote" data-bs-parent="#foodOptions">
+                                <div class="accordion-body">
+                                    <!-- Content for Note options -->
+                                    <p>Note content here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="HideModal">Close</button>
+                    <button type="button" class="btn btn-primary">Thanh toán</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private bool showModal = false;
+    private int quantity = 1;
+
+    private void ShowModal()
+    {
+        showModal = true;
+    }
+
+    private void HideModal()
+    {
+        showModal = false;
+    }
+
+    private void IncreaseQuantity()
+    {
+        quantity++;
+    }
+
+    private void DecreaseQuantity()
+    {
+        if (quantity > 1)
+        {
+            quantity--;
+        }
+    }
+}

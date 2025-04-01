@@ -19,10 +19,11 @@ namespace PRN222.MilkTeaShop.Repository.UnitOfWork
         private IGenericRepository<OrderDetail>? _orderDetailRepository;
         private IGenericRepository<Payment>? _paymentRepository;
         private IGenericRepository<PaymentMethod>? _paymentMethodRepository;
-        private IGenericRepository<Product>? _productRepository;
+        private IProductRepository? _productRepository;
         private IGenericRepository<ProductCombo>? _productComboRepository;
         private IGenericRepository<ProductSize>? _productSizeRepository;
-        private IGenericRepository<Size>? _sizeRepository;
+        //private IGenericRepository<Size>? _sizeRepository;
+        private ISizeRepository? _sizeRepository;
 
         public IGenericRepository<Category> Category
         {
@@ -102,13 +103,13 @@ namespace PRN222.MilkTeaShop.Repository.UnitOfWork
             }
         }
 
-        public IGenericRepository<Product> Product
+        public IProductRepository Product
         {
             get
             {
                 if (this._productRepository == null)
                 {
-                    this._productRepository = new GenericRepository<Product>(context);
+                    this._productRepository = new ProductRepository(context);
                 }
                 return _productRepository;
             }
@@ -138,13 +139,24 @@ namespace PRN222.MilkTeaShop.Repository.UnitOfWork
             }
         }
 
-        public IGenericRepository<Size> Size
+        //public IGenericRepository<Size> Size
+        //{
+        //    get
+        //    {
+        //        if (this._sizeRepository == null)
+        //        {
+        //            this._sizeRepository = new GenericRepository<Size>(context);
+        //        }
+        //        return _sizeRepository;
+        //    }
+        //}
+        public ISizeRepository Size
         {
             get
             {
                 if (this._sizeRepository == null)
                 {
-                    this._sizeRepository = new GenericRepository<Size>(context);
+                    this._sizeRepository = new SizeRepository(context);
                 }
                 return _sizeRepository;
             }

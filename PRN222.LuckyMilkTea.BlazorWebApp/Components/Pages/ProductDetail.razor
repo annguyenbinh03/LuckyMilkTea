@@ -1,0 +1,26 @@
+﻿@page "/ProductDetail"
+
+<h3>ProductDetail</h3>
+
+<select @onchange="HandleSelectionChange">
+    <option value="">Chọn một giá trị</option>
+    <option value="1">Lựa chọn 1</option>
+    <option value="2">Lựa chọn 2</option>
+    <option value="3">Lựa chọn 3</option>
+</select>
+
+<div>string: @a</div>
+
+@code {
+    private string a = ""; // Đảm bảo biến có giá trị khởi tạo hợp lệ
+
+    private void HandleSelectionChange(ChangeEventArgs e)
+    {
+        if (e.Value != null)
+        {
+            a = e.Value.ToString();
+            Console.WriteLine($"Giá trị được chọn: {a}");
+            InvokeAsync(StateHasChanged); // Đảm bảo UI được cập nhật
+        }
+    }
+}
