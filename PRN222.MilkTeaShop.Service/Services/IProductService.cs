@@ -10,6 +10,8 @@ namespace PRN222.MilkTeaShop.Service.Services
     public interface IProductService
     {
         public Task<List<Product>> GetAll();
+        public Task<List<Product>> GetMilkTeas();
+
     }
 }
 

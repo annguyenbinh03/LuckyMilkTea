@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PRN222.MilkTeaShop.Repository.DbContexts;
 using PRN222.MilkTeaShop.Repository.Repositories;
+using PRN222.MilkTeaShop.Repository.UnitOfWork;
+using PRN222.MilkTeaShop.Service.Services;
 
 namespace PRN222.MilkTeaShop.Manager
 {
@@ -17,6 +19,8 @@ namespace PRN222.MilkTeaShop.Manager
                     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped(typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IProductService, ProductService>();
 
             var app = builder.Build();
 
@@ -27,6 +31,11 @@ namespace PRN222.MilkTeaShop.Manager
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.MapGet("/", context => {
+                    context.Response.Redirect("/Manager/Dashboard");
+                return Task.CompletedTask;
+            });
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

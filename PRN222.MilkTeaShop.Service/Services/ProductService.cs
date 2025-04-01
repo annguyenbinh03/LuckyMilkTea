@@ -23,5 +23,12 @@ namespace PRN222.MilkTeaShop.Service.Services
 
             return products.ToList(); 
         }
+
+        public async Task<List<Product>> GetMilkTeas()
+        {
+            var products = await _unitOfWork.Product.GetMilkTeas();
+
+            return products;
+        }
     }
 }
