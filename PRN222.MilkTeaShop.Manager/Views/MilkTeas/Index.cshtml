@@ -74,8 +74,8 @@
 					@Html.DisplayFor(modelItem => item.UpdatedAt)
 				</td>
 				<td>
-					@*   <a asp-action="./Edit" asp-route-id="@item.Id">Edit</a> |
-				<a asp-action="./Delete" asp-route-id="@item.Id">Delete</a> *@
+					<a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Chỉnh sửa</a> 
+@* 				<a asp-action="./Delete" asp-route-id="@item.Id">Delete</a>  *@
 				</td>
 			</tr>
 		}

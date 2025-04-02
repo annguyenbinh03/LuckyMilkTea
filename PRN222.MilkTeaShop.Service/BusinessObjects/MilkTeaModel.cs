@@ -22,9 +22,9 @@ namespace PRN222.MilkTeaShop.Service.BusinessObjects
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? UpdatedAt { get; set; }
-		public decimal? PriceSizeS { get; set; }
-		public decimal? PriceSizeM { get; set; }
-        public decimal? PriceSizeL { get; set; }
+		public decimal PriceSizeS { get; set; }
+		public decimal PriceSizeM { get; set; }
+        public decimal PriceSizeL { get; set; }
 
 		public Product ToProduct()
         {

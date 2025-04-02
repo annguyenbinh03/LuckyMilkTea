@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CloudinaryDotNet;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using PRN222.MilkTeaShop.Manager.Models.Request;
-using PRN222.MilkTeaShop.Repository.DbContexts;
-using PRN222.MilkTeaShop.Repository.Models;
 using PRN222.MilkTeaShop.Service.BusinessObjects;
 using PRN222.MilkTeaShop.Service.Services;
 
@@ -93,8 +83,29 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
         // GET: MilkTeas/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var model = await _productService.GetMilkTea((int)id);
 
-            return View();
+            if(model == null)
+            {
+                return NotFound();
+            }
+
+            var request = new MilkTeaUpdateRequest
+            {
+                Id = model.Id,
+                Name = model.Name,
+                Description = model.Description,
+                PriceSizeS = model.PriceSizeS,
+                PriceSizeM = model.PriceSizeM,
+                PriceSizeL = model.PriceSizeL,
+                ImageUrl = model.ImageUrl,
+            };
+
+            return View(request);
         }
 
         // POST: MilkTeas/Edit/5
@@ -102,12 +113,42 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,CategoryId,ImageUrl,Status,CreatedAt,UpdatedAt")] Product product)
+        public async Task<IActionResult> Edit([Bind("Id,Name,Description,PriceSizeS,PriceSizeM,PriceSizeL,Image")] MilkTeaUpdateRequest request)
         {
+			if (request.Image != null && request.Image.Length > 0)
+			{
+                string? url = null; 
+				using var stream = request.Image.OpenReadStream();
+				url = await _cloudinaryService.UploadImageAsync(stream, request.Name);
+				if (url == null)
+				{
+					ModelState.AddModelError("Image", "Không thể tải ảnh lên.");
+					return View(request);
+				}
+                request.ImageUrl = url;
+			}
 
+			var model = new MilkTeaModel
+			{
+                Id = request.Id,
+				Name = request.Name,
+				Description = request.Description,
+				ImageUrl = request.ImageUrl,
+				PriceSizeS = request.PriceSizeS,
+				PriceSizeM = request.PriceSizeM,
+				PriceSizeL = request.PriceSizeL
+			};
+			try
+			{
+				await _productService.UpdateMilkTea(model);
+			}
+			catch (Exception e)
+			{
+				ViewBag.Error = e.Message;
+			}
 
-            return View();
-        }
+			return RedirectToAction(nameof(Index));
+		}
 
         // GET: MilkTeas/Delete/5
         public async Task<IActionResult> Delete(int? id)

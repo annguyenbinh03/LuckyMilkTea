@@ -21,7 +21,88 @@ namespace PRN222.MilkTeaShop.Service.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task CreateMilkTea(MilkTeaModel model)
+		public async Task<MilkTeaModel?> GetMilkTea(int id)
+        {
+           var product = await _unitOfWork.Product.GetMilkTea(id);
+            if (product == null)
+                return null;
+            MilkTeaModel model = new MilkTeaModel
+            {
+                Id = id,
+                Name = product.Name,
+                Description = product.Description,
+                ImageUrl = product.ImageUrl,
+                Status = product.Status,
+                PriceSizeS = product.ProductSizes.ToList()[0].Price,
+                PriceSizeM = product.ProductSizes.ToList()[1].Price,
+                PriceSizeL = product.ProductSizes.ToList()[2].Price,
+            };
+
+            return model;
+		}
+
+		public async Task UpdateMilkTea(MilkTeaModel model)
+		{
+			Product? product = await _unitOfWork.Product.GetByIdAsync(model.Id);
+
+            if(product == null) return;
+
+			product.UpdatedAt = TimeZoneUtil.GetCurrentTime();
+
+            if (product.Name != model.Name)
+            {
+                product.Name = model.Name;
+            }
+
+			if (product.Description != model.Description)
+			{
+				product.Description = model.Description;
+			}
+
+			if (product.ImageUrl != model.ImageUrl && !string.IsNullOrEmpty(model.ImageUrl))
+			{
+				product.ImageUrl = model.ImageUrl;
+			}
+
+			if (product == null)
+			{
+				throw new Exception("Can not parse product");
+			}
+			try
+			{
+				_unitOfWork.Product.Update(product);
+
+                var productSizeS = await _unitOfWork.ProductSize.FirstOrDefaultAsync(filter: ps => ps.ProductId == model.Id &&  ps.SizeId == (int)ProductSizeEnum.S);
+                if(productSizeS != null)
+                {
+					productSizeS.Price = (decimal)model.PriceSizeS;
+					_unitOfWork.ProductSize.Update(productSizeS);
+				}
+              
+				var productSizeM = await _unitOfWork.ProductSize.FirstOrDefaultAsync(filter: ps => ps.ProductId == model.Id && ps.SizeId == (int)ProductSizeEnum.M);
+                if(productSizeM != null)
+                {
+					productSizeM.Price = (decimal)model.PriceSizeM;
+					_unitOfWork.ProductSize.Update(productSizeM);
+				}
+				
+
+				var productSizeL = await _unitOfWork.ProductSize.FirstOrDefaultAsync(filter: ps => ps.ProductId == model.Id && ps.SizeId == (int)ProductSizeEnum.L);
+				if (productSizeL != null)
+				{
+					productSizeL.Price = (decimal)model.PriceSizeL;
+					_unitOfWork.ProductSize.Update(productSizeL);
+				}
+				await _unitOfWork.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+
+		}
+
+		public async Task CreateMilkTea(MilkTeaModel model)
         {
             Product? product = model.ToProduct();
             product.CategoryId = 1;

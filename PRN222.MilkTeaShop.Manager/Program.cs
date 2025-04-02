@@ -42,7 +42,7 @@ public class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=MilkTeas}/{action=Create}");
+            pattern: "{controller=MilkTeas}/{action=Index}");
 
         app.Run();
     }
