@@ -9,6 +9,6 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
 {
     public interface IProductRepository : IGenericRepository<Product>
     {
-       Task<List<Product>> GetMilkTeas();
+       Task<(IEnumerable<Product>, int)> GetMilkTeas(string? search, int? page = null, int? pageSize = null);
     }
 }

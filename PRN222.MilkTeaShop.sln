@@ -3,14 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN222.MilkTeaShop.Manager", "PRN222.MilkTeaShop.Manager\PRN222.MilkTeaShop.Manager.csproj", "{55A20C7F-480A-489E-B126-73A77F737D71}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN222.MilkTeaShop.Repository", "PRN222.MilkTeaShop.Repository\PRN222.MilkTeaShop.Repository.csproj", "{7296BF3D-6BB6-4C5A-A762-6544DE47CA71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222.MilkTeaShop.Service", "PRN222.MilkTeaShop.Service\PRN222.MilkTeaShop.Service.csproj", "{8D9B1A5B-ADEB-4409-8847-E69E10D0A8D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN222.MilkTeaShop.Service", "PRN222.MilkTeaShop.Service\PRN222.MilkTeaShop.Service.csproj", "{8D9B1A5B-ADEB-4409-8847-E69E10D0A8D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222.MilkTeaShop.Staff", "PRN222.MilkTeaShop.Staff\PRN222.MilkTeaShop.Staff.csproj", "{E3358F3D-B134-442A-829E-BDC48157065D}"
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222.LuckyMilkTea.BlazorWebApp", "PRN222.LuckyMilkTea.BlazorWebApp\PRN222.LuckyMilkTea.BlazorWebApp.csproj", "{860C2535-C1FA-40C5-86E6-5EDAF3576C05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN222.MilkTeaShop.Staff", "PRN222.MilkTeaShop.Staff\PRN222.MilkTeaShop.Staff.csproj", "{E3358F3D-B134-442A-829E-BDC48157065D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PRN222.LuckyMilkTea.BlazorWebApp", "PRN222.LuckyMilkTea.BlazorWebApp\PRN222.LuckyMilkTea.BlazorWebApp.csproj", "{860C2535-C1FA-40C5-86E6-5EDAF3576C05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRN222.MilkTeaShop.Manager", "PRN222.MilkTeaShop.Manager\PRN222.MilkTeaShop.Manager.csproj", "{8DCB69AD-8D97-402E-B248-F8019D0F36E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{55A20C7F-480A-489E-B126-73A77F737D71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{55A20C7F-480A-489E-B126-73A77F737D71}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{55A20C7F-480A-489E-B126-73A77F737D71}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{55A20C7F-480A-489E-B126-73A77F737D71}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7296BF3D-6BB6-4C5A-A762-6544DE47CA71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7296BF3D-6BB6-4C5A-A762-6544DE47CA71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7296BF3D-6BB6-4C5A-A762-6544DE47CA71}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,6 +35,10 @@ Global
 		{860C2535-C1FA-40C5-86E6-5EDAF3576C05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{860C2535-C1FA-40C5-86E6-5EDAF3576C05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{860C2535-C1FA-40C5-86E6-5EDAF3576C05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DCB69AD-8D97-402E-B248-F8019D0F36E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DCB69AD-8D97-402E-B248-F8019D0F36E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DCB69AD-8D97-402E-B248-F8019D0F36E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DCB69AD-8D97-402E-B248-F8019D0F36E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
