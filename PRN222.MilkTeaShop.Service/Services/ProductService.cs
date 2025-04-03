@@ -283,7 +283,6 @@ namespace PRN222.MilkTeaShop.Service.Services
             }
         }
 
-
         public async Task<(IEnumerable<ComboModel>, int)> GetCombos(string? search, int? page = null, int? pageSize = null)
         {
             var (products, totalItems) = await _unitOfWork.Product.GetCombos(search, page, pageSize);
@@ -393,7 +392,5 @@ namespace PRN222.MilkTeaShop.Service.Services
 			}
 		}
 	}
-
-
  
 }
