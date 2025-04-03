@@ -76,5 +76,24 @@ namespace PRN222.MilkTeaShop.Service.Services
                 await AddToppingToOrderDetailAsync(orderDetail.Id, toppingId);
             }
         }
+        public async Task<List<OrderDetail>> GetOrderDetailsByOrderIdAsync(int orderId)
+        {
+            try
+            {
+                var orderDetails = await _context.OrderDetails
+                    .Where(od => od.OrderId == orderId)
+                    .Include(od => od.Product)
+                    .Include(od => od.Size)
+                    .ToListAsync();
+
+                return orderDetails;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi lấy OrderDetails: {ex.Message}");
+                return new List<OrderDetail>();
+            }
+        }
+
     }
 }

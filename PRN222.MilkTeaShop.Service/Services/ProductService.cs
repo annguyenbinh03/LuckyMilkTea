@@ -1,14 +1,10 @@
-﻿using Azure;
+﻿using Microsoft.EntityFrameworkCore;
 using PRN222.MilkTeaShop.Repository.Enums;
 using PRN222.MilkTeaShop.Repository.Models;
 using PRN222.MilkTeaShop.Repository.UnitOfWork;
 using PRN222.MilkTeaShop.Service.BusinessObjects;
 using PRN222.MilkTeaShop.Service.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static Azure.Core.HttpHeader;
 
 namespace PRN222.MilkTeaShop.Service.Services
 {
@@ -207,7 +203,7 @@ namespace PRN222.MilkTeaShop.Service.Services
 		public async Task CreateTopping(ToppingModel model)
 		{
 			Product? product = model.ToProduct();
-			product.CategoryId = 2;
+			product.CategoryId = 3;
 			product.Status = ProductStatus.active.ToString();
 			product.CreatedAt = TimeZoneUtil.GetCurrentTime();
 			product.UpdatedAt = TimeZoneUtil.GetCurrentTime();
@@ -286,6 +282,7 @@ namespace PRN222.MilkTeaShop.Service.Services
                 throw new Exception(ex.Message);
             }
         }
+<<<<<<< HEAD
         public async Task UpdateProductSoldCount(int productId, int soldCount)
         {
             var product = await _unitOfWork.Product.GetByIdAsync(productId);
@@ -298,6 +295,118 @@ namespace PRN222.MilkTeaShop.Service.Services
             }
         }
     }
+=======
+
+        public async Task<(IEnumerable<ComboModel>, int)> GetCombos(string? search, int? page = null, int? pageSize = null)
+        {
+            var (products, totalItems) = await _unitOfWork.Product.GetCombos(search, page, pageSize);
+            List<ComboModel> comboModels = new List<ComboModel>();
+            foreach (var combo in products)
+            {
+                var comboModel = new ComboModel
+                {
+                    Id = combo.Id,
+                    Name = combo.Name,
+                    Description = combo.Description,
+                    Price = combo.Price,
+                    ImageUrl = combo.ImageUrl,
+                    SoldCount = combo.SoldCount,
+                    Status = combo.Status,
+                    UpdatedAt = combo.UpdatedAt,
+                    Products = new List<ProductInCombo>()
+                };
+
+                // Populate List<ProductCombo>
+                foreach (var productCombo in combo.ProductComboCombos)
+                {
+                    var product = await _unitOfWork.Product.GetByIdAsync(productCombo.ProductId);
+                    if (product != null)
+                    {
+                        var productComboModel = new ProductInCombo
+                        {
+                            Id = product.Id,
+                            Name = product.Name,
+                            Quantity = productCombo.Quantity,
+                            ImageUrl = product.ImageUrl,
+                            Price = product.Price,
+                        };
+
+                        //Assign Size to productComboModel if it is not null
+                        if (productCombo.ProductSizeId.HasValue)
+                        {
+                            var productSize = await _unitOfWork.ProductSize.GetByIdAsync(productCombo.ProductSizeId, includes: ps => ps.Size);
+
+                            productComboModel.Size = productSize.Size.Name.ToString(); //Set Size Number
+                        }
+
+                        comboModel.Products.Add(productComboModel);
+                    }
+                }
+
+                comboModels.Add(comboModel);
+            }
+            return (comboModels, totalItems);
+        }
+
+        public async Task<Product?> GetCombo(int id)
+        {
+            var product = await _unitOfWork.Product.GetCombo(id);
+            if (product == null)
+                return null;
+
+            return product;
+        }
+
+		public async Task CreateCombo(ComboModel model)
+		{
+            Product? product = new Product();
+            product.Id = model.Id;
+            product.Name = model.Name;
+            product.Description = model.Description;
+            product.Price = model.Price;
+            product.ImageUrl = model.ImageUrl;
+			product.CategoryId = 2;
+			product.Status = ProductStatus.active.ToString();
+			product.CreatedAt = TimeZoneUtil.GetCurrentTime();
+			product.UpdatedAt = TimeZoneUtil.GetCurrentTime();
+
+			if (product == null)
+			{
+				throw new Exception("Can not parse product");
+			}
+            try
+            {
+                await _unitOfWork.Product.AddAsync(product);
+
+                foreach(ProductInCombo item in model.Products)
+                {
+                    ProductCombo combo = new ProductCombo();
+                    combo.ProductId = item.Id;
+                    combo.Quantity = item.Quantity;
+                    combo.Combo = product;
+
+                    if (!string.IsNullOrEmpty(item.Size)){
+						ProductSizeEnum sizeEnum = (ProductSizeEnum)Enum.Parse(typeof(ProductSizeEnum), item.Size);
+						int sizeValue = (int)sizeEnum;
+						ProductSize? productSize = await _unitOfWork.ProductSize.FirstOrDefaultAsync(filter: ps => ps.ProductId == item.Id && ps.SizeId == sizeValue);
+                        combo.ProductSizeId = productSize.Id;
+                    }
+                    else
+                    {
+						combo.ProductSizeId = null;
+						combo.ProductSize = null;
+					}
+                    await _unitOfWork.ProductCombo.AddAsync(combo);
+				}
+                await _unitOfWork.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+		}
+	}
+>>>>>>> 921ced7630bc7e30b031a4b41ae63186a5a81bae
 
 
 

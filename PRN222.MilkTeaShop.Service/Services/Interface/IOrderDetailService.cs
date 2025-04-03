@@ -13,5 +13,6 @@ namespace PRN222.MilkTeaShop.Service.Services.Interface
 
         Task AddToppingToOrderDetailAsync(int orderDetailId, int toppingId);
         Task AddProductToOrderAsync(int orderId, int productId, int sizeId, List<int> toppingIds);
+        Task<List<OrderDetail>> GetOrderDetailsByOrderIdAsync(int orderId);
     }
 }

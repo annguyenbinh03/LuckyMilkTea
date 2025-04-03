@@ -31,7 +31,7 @@ public partial class Product
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-    public virtual ICollection<ProductCombo> ProductComboCombos { get; set; } = new List<ProductCombo>();
+    public virtual ICollection<ProductCombo> ProductComboCombos { get; set; } = new List<ProductCombo>(); //contain products of this combo
 
     public virtual ICollection<ProductCombo> ProductComboProducts { get; set; } = new List<ProductCombo>();
 

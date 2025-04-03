@@ -27,3 +27,12 @@
     </div>
 </form>
 
+<script>
+    document.getElementById("paymentForm").addEventListener("submit", function (event) {
+        var paymentMethod = document.getElementById("PaymentMethodId").value;
+        if (paymentMethod === "1") {  // Credit Card được chọn
+            event.preventDefault();  // Ngăn chặn form gửi đi
+            window.location.href = "/payments";  // Điều hướng đến trang /payments
+        }
+    });
+</script>

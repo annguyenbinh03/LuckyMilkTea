@@ -1,0 +1,253 @@
+﻿@model PRN222.MilkTeaShop.Manager.Models.Request.ComboCreationRequest
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using PRN222.MilkTeaShop.Manager.Models.Response
+@{
+	ViewData["HeaderTitle"] = "Combo";
+	ViewData["Title"] = "Create";
+	Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+	List<ProductViewModel> products = ViewBag.Products as List<ProductViewModel>;
+	List<ProductViewModel> milkTeas = products?.Where(p => p.IsMilkTea).ToList();
+	List<ProductViewModel> toppings = products?.Where(p => !p.IsMilkTea).ToList();
+}
+
+<div class="row">
+	<form asp-action="Create" enctype="multipart/form-data">
+		<div class="row d-flex justify-content-between">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label asp-for="Name" class="control-label"></label>
+					<input asp-for="Name" class="form-control" />
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Description" class="control-label"></label>
+					<input asp-for="Description" class="form-control" />
+					<span asp-validation-for="Description" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Price" class="control-label">Giá cho combo</label>
+					<input asp-for="Price" class="form-control" />
+					<span asp-validation-for="Price" class="text-danger"></span>
+				</div>
+
+				<div>
+					@if (milkTeas != null && milkTeas.Any())
+					{
+						<div class="form-group">
+							<label class="form-label">Chọn Milk Tea:</label>
+							<select class="form-select" id="milkTeaDropdown">
+								@foreach (var milkTea in milkTeas)
+								{
+									foreach (var size in milkTea.Sizes)
+									{
+										<option value="@milkTea.Id-@size.SizeId" data-sizeName="@size.SizeName" data-price="@size.Price" data-name="@milkTea.Name">
+											@milkTea.Name - @size.SizeName (@size.Price.ToString("N0") VND)
+										</option>
+									}
+								}
+							</select>
+						</div>
+
+						<div>
+							<label class="form-label">Số lượng:</label>
+							<input type="number" class="rounded py-1 ps-2" value="1" min="1" id="milkTeaQuantity" />
+							<button type="button" class="btn btn-primary" onclick="addProductToCombo()">Thêm trà sữa vào Combo</button>
+						</div>
+					}
+					else
+					{
+						<p>Không có milk tea nào.</p>
+					}
+				</div>
+				<div class="mt-2">
+					@if (toppings != null && toppings.Any())
+					{
+						<div class="form-group">
+							<label class="form-label">Chọn Topping:</label>
+							<select class="form-select" id="toppingDropdown">
+								@foreach (var topping in toppings)
+								{
+									<option value="@topping.Id" data-image="@topping.ImageUrl" data-price="@(topping.Price.HasValue ? (int)topping.Price : 0)">
+										@topping.Name
+									</option>
+								}
+							</select>
+						</div>
+						<div class="form-group">
+							<label class="form-label">Số lượng:</label>
+							<input type="number" class="rounded py-1 ps-2" value="1" min="1" id="toppingQuantity" />
+							<button type="button" class="btn btn-primary" onclick="addToppingToCombo()">Thêm topping vào Combo</button>
+						</div>
+					}
+					else
+					{
+						<p>Không có topping nào.</p>
+					}
+				</div>
+			</div>
+			<!--For hidden input-->
+			<input type="hidden" asp-for="Products" name="Products" id="productsData"/>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label asp-for="Image" class="control-label">Ảnh sản phẩm</label>
+					<input asp-for="Image" type="file" class="form-control" id="imageUpload" name="Image" accept="image/*" />
+					<span asp-validation-for="Image" class="text-danger"></span>
+				</div>
+				<div>
+					<img id="previewImage" src="#" alt="Preview" style="display:none; max-width:200px; max-height:200px;" />
+				</div>
+				<div class="mt-2">
+					Các sản phẩm bên trong combo:
+					<div id="addedProducts" class="form-group mt-1">
+					</div>
+					<div id="totalMoney" class="text-end text-danger">
+					</div>
+				</div>
+
+			</div>
+
+			<div class="form-group d-flex justify-content-end mt-4">
+				<div>
+					<span class="text-danger"> @ViewBag.Error </span>
+				</div>
+				<input type="submit" value="Tạo combo" class="btn btn-primary" />
+
+				<a class="btn btn-secondary ms-3" asp-action="Index">Trở về danh sách</a>
+			</div>
+			</div>
+	</form>
+</div>
+
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script>
+		document.getElementById('imageUpload').addEventListener('change', function (event) {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+
+				reader.onload = function (e) {
+					document.getElementById('previewImage').src = e.target.result;
+					document.getElementById('previewImage').style.display = 'block';
+				}
+
+				reader.readAsDataURL(file);
+			} else {
+				document.getElementById('previewImage').src = '#';
+				document.getElementById('previewImage').style.display = 'none';
+			}
+		});
+
+		var addedProducts = [];
+
+		function addProductToCombo() {
+			var selectedValue = document.getElementById("milkTeaDropdown").value;
+			// Split the ID to extract product and size
+			var parts = selectedValue.split('-');
+			if (parts.length !== 2) {
+				console.error("Invalid selection: ", selectedValue);
+				return;
+			}
+
+			var productId = parts[0];
+			var sizeId = parts[1];
+			var quantity = document.getElementById("milkTeaQuantity").value;
+			//Get Milk tea and sizes data
+			var milkTeas = @Html.Raw(Json.Serialize(ViewBag.Milkteas));
+
+			var milkTea = milkTeas.find(mt => mt.id.toString() == productId);
+			var productName = milkTea.name; // Replace with your actual variable
+			//Get and assigned size
+			var selectedSize = milkTea.sizes.find(size => size.sizeId == sizeId);
+			//Add the Price
+			var price = selectedSize.price;
+
+			var existingProductIndex = addedProducts.findIndex(p => p.ProductId === productId && p.SizeId === sizeId);
+
+			if (existingProductIndex > -1) {
+				addedProducts[existingProductIndex].Quantity = Number(addedProducts[existingProductIndex].Quantity) + Number(quantity);
+			} else {
+				var product = {
+					ProductId: productId,
+					SizeId: sizeId,
+					SizeName: selectedSize.sizeName,
+					Quantity: quantity,
+					Name: productName,
+					ImageUrl: milkTea.imageUrl,
+					Price: selectedSize.price
+				};
+				addedProducts.push(product);
+			}
+
+			updateHiddenField();
+			displayAddedProducts();
+		}
+
+		function updateHiddenField() {
+			addedProducts = addedProducts.map(product => ({
+				...product,
+				ProductId: parseInt(product.ProductId), 
+				Quantity: parseInt(product.Quantity),   
+				SizeId: product.SizeId ? parseInt(product.SizeId) : null,
+				Price: product.Price ? parseInt(product.Price) : null
+			}));
+			document.getElementById("productsData").value = JSON.stringify(addedProducts);
+			console.log(document.getElementById("productsData").value);
+		}
+		function displayAddedProducts() {
+			var html = '';
+			var totalMoney = 0;
+			addedProducts.forEach(product => {
+				var itemTotal = product.Quantity * product.Price;
+				totalMoney += itemTotal;
+				html +=
+					`<div class="border rounded w-100 p-2 m-1" style="width: auto; display: inline-block;">
+									<img class="rounded me-1" width="30px" src="${product.ImageUrl}"" />
+										${product.Name} (${product.Quantity})
+									   <span> ${product.SizeName ? `(Size: ${product.SizeName}) - ` : ""} ${product.Price} VND </span>
+								</div>`;
+			});
+			document.getElementById("addedProducts").innerHTML = html;
+			document.getElementById("totalMoney").innerHTML = `<h5>Tổng giá trị sản phẩm trong combo: ${totalMoney.toLocaleString()} VND</h5>`;
+		}
+
+		function addToppingToCombo() {
+			var toppingDropdown = document.getElementById("toppingDropdown");
+			var toppingQuantity = document.getElementById("toppingQuantity").value;
+			var toppingId = toppingDropdown.value;
+			var toppingName = toppingDropdown.options[toppingDropdown.selectedIndex].text;
+			var toppingPrice = toppingDropdown.options[toppingDropdown.selectedIndex].getAttribute("data-price");;
+			var imageUrl = toppingDropdown.options[toppingDropdown.selectedIndex].getAttribute("data-image");
+
+			if (!toppingId) {
+				console.error("No Topping selected.");
+				return;
+			}
+
+			var existingToppingIndex = addedProducts.findIndex(p => p.ProductId === toppingId);
+
+			if (existingToppingIndex > -1) {
+				addedProducts[existingToppingIndex].Quantity = Number(addedProducts[existingToppingIndex].Quantity) + Number(toppingQuantity);
+			} else {
+				var topping = {
+					ProductId: toppingId,
+					SizeId: null,
+					SizeName: null,
+					Quantity: toppingQuantity,
+					Name: toppingName,
+					ImageUrl: imageUrl,
+					Price: toppingPrice
+				};
+				addedProducts.push(topping);
+			}
+
+			updateHiddenField();
+			displayAddedProducts();
+		}
+	</script>
+}
+
