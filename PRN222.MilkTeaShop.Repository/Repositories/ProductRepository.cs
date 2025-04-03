@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PRN222.MilkTeaShop.Repository.Models;
+using PRN222.MilkTeaShop.Repository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +56,7 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
 
 			return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == id);
 		}
-    public async Task<List<Product>> GetMilkTeas()
+    public async Task<List<Product>> GetStartMilkTeas()
     {
         return await _dbSet
            .Where(p => p.CategoryId == 1)
@@ -64,12 +65,5 @@ public class ProductRepository : GenericRepository<Product>, IProductRepository
            .ToListAsync();
     }
 
-    public async Task<List<Product>> GetProductsByCategoryIds(List<int> categoryIds)
-    {
-        return await _dbSet
-           .Where(p => categoryIds.Contains(p.CategoryId))
-           .Include(p => p.ProductSizes)
-           .ThenInclude(ps => ps.Size)
-           .ToListAsync();
-    }
+   
 }

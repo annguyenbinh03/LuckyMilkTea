@@ -189,5 +189,14 @@ namespace PRN222.MilkTeaShop.Service.Services
 
 			await _unitOfWork.SaveChanges();
 		}
-	}
+
+        public async Task<List<Product>> GetStartMilkTeas()
+        {
+            var products = await _unitOfWork.Product.GetStartMilkTeas();
+
+            return products;
+        }
+
+ 
+    }
 }

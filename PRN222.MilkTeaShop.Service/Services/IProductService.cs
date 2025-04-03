@@ -18,10 +18,7 @@ namespace PRN222.MilkTeaShop.Service.Services
 		Task Delete(int id);
 		Task Active(int id);
 
-        Task<List<Product>> GetAll();
-        Task<List<Product>> GetMilkTeas();
-        Task<List<Product>> GetProductsByCategoryIds(List<int> categoryIds);
-
+        Task<List<Product>> GetStartMilkTeas();
     }
 }
 

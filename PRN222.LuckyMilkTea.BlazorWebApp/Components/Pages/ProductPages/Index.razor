@@ -113,7 +113,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        products = await ProductService.GetMilkTeas();
+        products = await ProductService.GetStartMilkTeas();
 
         sizes = await SizeService.GetListSize();
     }
