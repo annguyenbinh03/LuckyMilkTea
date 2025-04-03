@@ -3,49 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using PRN222.MilkTeaShop.Repository.DbContexts;
 using PRN222.MilkTeaShop.Repository.Models;
+using PRN222.MilkTeaShop.Repository.Repositories;
 using PRN222.MilkTeaShop.Service.Services.Interface;
 
 namespace PRN222.MilkTeaShop.Service.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly MilkTeaDBContext _context;
+        private readonly IOrderRepository _orderRepository;
 
-        public OrderService(MilkTeaDBContext context)
+        public OrderService(IOrderRepository orderRepository)
         {
-            _context = context;
-        }
-
-        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
-        {
-            return await Task.FromResult(_context.Orders.ToList());
+            _orderRepository = orderRepository;
         }
 
         public async Task<Order> GetOrderByIdAsync(int orderId)
         {
-            return await Task.FromResult(_context.Orders.FirstOrDefault(o => o.Id == orderId));
+            return await _orderRepository.GetOrderByIdAsync(orderId);
         }
 
-        public async Task<Order> CreateOrderAsync(Order order)
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
         {
-            _context.Orders.Add(order);
-            await _context.SaveChangesAsync();
-            return order;
+            return await _orderRepository.GetAllOrdersAsync();
         }
 
-        public async Task<bool> UpdateOrderStatusAsync(int orderId, string status)
+        public async Task CreateOrderAsync(Order order)
         {
-            var order = _context.Orders.FirstOrDefault(o => o.Id == orderId);
-            if (order == null) return false;
-
-            order.UpdateStatus(status);
-            await _context.SaveChangesAsync();
-            return true;
+            await _orderRepository.AddOrderAsync(order);
         }
 
-        
+        public async Task UpdateOrderAsync(Order order)
+        {
+            await _orderRepository.UpdateOrderAsync(order);
+        }
+
+        public async Task DeleteOrderAsync(int orderId)
+        {
+            await _orderRepository.DeleteOrderAsync(orderId);
+        }
     }
 }

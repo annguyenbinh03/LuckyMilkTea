@@ -1,20 +1,21 @@
 ﻿@page
 @model PRN222.MilkTeaShop.Staff.Pages.Payments.CreateModel
 @{
-    ViewData["Title"] = "Create Payment";
+    Layout = "_Layout";  // Sử dụng layout đã tạo ở trên
 }
+
 
 <h2>Create New Payment for Order @Model.OrderId</h2>
 
 <form method="post">
     <div class="form-group">
         <label for="Amount">Amount</label>
-        <input type="text" class="form-control" id="Amount" name="Payment.Amount" />
+        <input type="text" class="form-control" id="Amount" name="Payment.Amount" value="@Model.Amount" readonly />
     </div>
 
     <div class="form-group">
         <label for="PaymentMethodId">Payment Method</label>
-        <select class="form-control" id="PaymentMethodId" name="Payment.PaymentMethodId">
+        <select class="form-control" id="PaymentMethodId" name="Payment.PaymentMethodId" >
             <option value="1">Credit Card</option>
             <option value="2">Cash</option>
         </select>

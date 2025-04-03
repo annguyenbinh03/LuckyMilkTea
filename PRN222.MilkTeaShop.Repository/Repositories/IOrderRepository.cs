@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using PRN222.MilkTeaShop.Repository.Models;
 
-namespace PRN222.MilkTeaShop.Service.Services.Interface
+namespace PRN222.MilkTeaShop.Repository.Repositories
 {
-    public interface IOrderService
+    public interface IOrderRepository
     {
         Task<Order> GetOrderByIdAsync(int orderId);
         Task<IEnumerable<Order>> GetAllOrdersAsync();
-        Task CreateOrderAsync(Order order);
+        Task AddOrderAsync(Order order);
         Task UpdateOrderAsync(Order order);
         Task DeleteOrderAsync(int orderId);
     }
