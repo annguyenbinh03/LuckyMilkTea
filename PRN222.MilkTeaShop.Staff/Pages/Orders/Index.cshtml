@@ -66,13 +66,14 @@
         var detailsContent = document.getElementById("detailsContent-" + orderId);
 
         if (detailsRow.style.display === "none") {
-            detailsRow.style.display = "table-row"; // Hiện vùng chi tiết
+            detailsRow.style.display = "table-row"; // Hiện chi tiết
 
-            // Gửi request lấy OrderDetails
-            fetch(`/Orders/GetOrderDetails?orderId=${orderId}`)
+            fetch(`/Orders/Index?handler=OrderDetails&orderId=${orderId}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.length > 0) {
+                    if (data.error) {
+                        detailsContent.innerHTML = `<span class="text-danger">${data.error}</span>`;
+                    } else {
                         detailsContent.innerHTML = `
                             <table class="table table-sm">
                                 <thead>
@@ -81,28 +82,28 @@
                                         <th>Size</th>
                                         <th>Quantity</th>
                                         <th>Price</th>
+                                        <th>Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${data.map(od => `
                                         <tr>
                                             <td>${od.productName}</td>
-                                            <td>${od.sizeName || "N/A"}</td>
+                                            <td>${od.sizeName}</td>
                                             <td>${od.quantity}</td>
                                             <td>${od.price}</td>
+                                            <td>${od.isTopping ? "Topping" : "Main Product"}</td>
                                         </tr>
                                     `).join('')}
                                 </tbody>
                             </table>`;
-                    } else {
-                        detailsContent.innerHTML = "Không có sản phẩm nào trong đơn hàng này.";
                     }
                 })
                 .catch(error => {
-                    detailsContent.innerHTML = "Lỗi khi tải dữ liệu!";
+                    detailsContent.innerHTML = `<span class="text-danger">Lỗi khi tải dữ liệu: ${error.message}</span>`;
                 });
         } else {
-            detailsRow.style.display = "none"; // Ẩn vùng chi tiết
+            detailsRow.style.display = "none"; // Ẩn chi tiết
         }
     }
 </script>

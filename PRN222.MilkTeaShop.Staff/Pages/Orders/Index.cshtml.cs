@@ -56,20 +56,32 @@ namespace PRN222.MilkTeaShop.Staff.Pages.Orders
         }
         public async Task<IActionResult> OnGetOrderDetailsAsync(int orderId)
         {
-            var orderDetails = await _orderDetailService.GetAllOrderDetailsAsync();
+            try
+            {
+                var orderDetails = await _orderDetailService.GetOrderDetailsByOrderIdAsync(orderId);
 
-            var filteredDetails = orderDetails
-                .Where(od => od.OrderId == orderId)
-                .Select(od => new
+                if (orderDetails == null || !orderDetails.Any())
                 {
-                    productName = od.Product.Name,
-                    sizeName = od.Size != null ? od.Size.Name : "N/A",
-                    quantity = od.Quantity,
-                    price = od.Price
-                })
-                .ToList();
+                    return new JsonResult(new { error = "Không có chi tiết đơn hàng nào." });
+                }
 
-            return new JsonResult(filteredDetails);
+                var result = orderDetails.Select(od => new
+                {
+                    id = od.Id,
+                    productName = od.Product?.Name ?? "Unknown Product",
+                    sizeName = od.Size?.Name ?? "N/A",
+                    quantity = od.Quantity,
+                    price = od.Price,
+                    isTopping = od.ParentId != null  // Nếu có ParentId thì là topping
+                }).ToList();
+
+                return new JsonResult(result);
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = $"Lỗi server: {ex.Message}" });
+            }
         }
+
     }
 }
