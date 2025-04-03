@@ -1,0 +1,151 @@
+﻿@model IEnumerable<PRN222.MilkTeaShop.Service.BusinessObjects.ComboModel>
+
+@{
+    ViewData["Title"] = "Index";
+    ViewData["HeaderTitle"] = "Combo";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+    int totalPages = (int)Math.Ceiling((double)ViewBag.TotalItems / ViewBag.PageSize);
+    int currentPage = ViewBag.CurrentPage;
+    string search = ViewBag.Search ?? "";
+}
+
+<form class="mt-3" method="get" action="@Url.Action("Index")">
+    <div class="d-flex justify-content-between">
+        <div>
+            <input class="rounded h-100 ps-2" name="search" value="@search" placeholder="Tìm theo tên" />
+            <button class="btn btn-primary px-3 ms-2" type="submit">Apply</button>
+        </div>
+        <div>
+            <a class="btn btn-success" asp-action="Create">Tạo mới</a>
+        </div>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+               Products
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SoldCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedAt)
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td class="text-center" style="max-width: 150px;">
+                <img class="rounded me-2" width="120px" src="@item.ImageUrl" />
+
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+                <td style="max-width: 380px;>
+                    @if (item.Products != null && item.Products.Any())
+                    {
+                        <div class="d-flex flex-wrap">
+                            @foreach (var product in item.Products)
+                            {
+                                <div class="border rounded w-100 p-2 m-1" style="width: auto; display: inline-block;">
+                                    <img class="rounded me-1" width="30px" src="@product.ImageUrl" />
+                                    @product.Name (@product.Quantity)
+                                    @if (!string.IsNullOrEmpty(product.Size))
+                                    {
+                                        <span>(Size: @product.Size)</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <span>Không có sản phẩm nào trong combo này.</span>
+                    }
+            </td>
+            <td>
+                    @(((int)item.Price).ToString("N0")) VND
+            </td>
+                <td class="text-center">
+                @Html.DisplayFor(modelItem => item.SoldCount)
+            </td>
+            <td>
+                    <span class="badge @(item.Status == "active" ? "bg-success" : "bg-danger")">
+                        @{
+                            if (item.Status == "active")
+                            {
+                                @:<i class="bi bi-check-circle-fill text-success"></i> Đang bán
+                            }
+                            else
+                            {
+                                @:<i class="bi bi-x-circle-fill text-danger"></i> Ngừng bán
+                            }
+                        }
+                    </span>
+            </td>
+                <td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">
+                @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td>
+            <td>
+@*                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<!-- Hiển thị nút phân trang -->
+<div class="pagination justify-content-center">
+    @if (totalPages > 1)
+    {
+        <ul class="pagination">
+            @if (currentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = 1, search})">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1})">Previous</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = i,  search})">@i</a>
+                </li>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1,  search})">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="@Url.Action("Index", new { page = totalPages,  search})">Last</a>
+                </li>
+            }
+        </ul>
+    }
+</div>
