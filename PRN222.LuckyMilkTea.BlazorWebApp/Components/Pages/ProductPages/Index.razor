@@ -269,11 +269,20 @@
         // Thêm sản phẩm vào giỏ hàng
         CartService.AddToCart(product, sizeId, sizeName, toppings, itemTotalPrice, quantity);
 
-        // Tăng SoldCount của sản phẩm theo số lượng mua
+        // Tăng SoldCount của sản phẩm chính theo số lượng mua
         product.SoldCount = (product.SoldCount ?? 0) + quantity;
-        // Cập nhật SoldCount trong cơ sở dữ liệu
         await ProductService.UpdateProductSoldCount(product.Id, product.SoldCount ?? 0);
-      
+
+        // Cập nhật SoldCount cho các topping (CategoryId = 3)
+        foreach (var toppingId in selectedToppings)
+        {
+            var topping = availableToppings.FirstOrDefault(t => t.Id.ToString() == toppingId);
+            if (topping != null && topping.CategoryId == 3) // Chỉ cập nhật cho topping
+            {
+                topping.SoldCount = (topping.SoldCount ?? 0) + quantity;
+                await ProductService.UpdateProductSoldCount(topping.Id, topping.SoldCount ?? 0);
+            }
+        }
 
         // Hiển thị thông báo thành công
         successMessage = "Sản phẩm đã được thêm vào giỏ hàng!";
