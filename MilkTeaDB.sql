@@ -39,17 +39,6 @@ CREATE TABLE Product (
 );
 GO
 
--- Bảng trung gian ProductCombo
-CREATE TABLE ProductCombo (
-    ComboId INT NOT NULL,
-    ProductId INT NOT NULL,
-    Quantity INT NOT NULL,
-    PRIMARY KEY (ComboId, ProductId),
-    FOREIGN KEY (ComboId) REFERENCES Product(Id) ON DELETE NO ACTION,
-    FOREIGN KEY (ProductId) REFERENCES Product(Id) ON DELETE NO ACTION
-);
-GO
-
 CREATE TABLE ProductSize (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ProductId INT NOT NULL,
@@ -59,6 +48,20 @@ CREATE TABLE ProductSize (
     FOREIGN KEY (SizeId) REFERENCES Size(Id) ON DELETE CASCADE,
     UNIQUE (ProductId, SizeId)
 );
+
+
+-- Bảng trung gian ProductCombo
+CREATE TABLE ProductCombo (
+    ComboId INT NOT NULL,
+    ProductId INT NOT NULL,
+    Quantity INT NOT NULL,
+	ProductSizeId INT NULL,
+    PRIMARY KEY (ComboId, ProductId),
+    FOREIGN KEY (ComboId) REFERENCES Product(Id) ON DELETE NO ACTION,
+    FOREIGN KEY (ProductId) REFERENCES Product(Id) ON DELETE NO ACTION,
+    FOREIGN KEY (ProductSizeId) REFERENCES ProductSize(Id) ON DELETE NO ACTION,
+);
+GO
 
 -- Bảng nhân viên
 CREATE TABLE Employee (
@@ -150,10 +153,10 @@ VALUES
 (N'Bánh flan', N'Bánh flan sẽ có vị riêng nhưng thường là béo mềm, kết cấu có tính đàn hồi tốt và thơm mùi matcha, trứng gà hoặc caramel.', 5000, 3, 'https://th.bing.com/th/id/OIP.qCtmYbQFsm3Plju9WqXLpgHaHa?w=600&h=600&rs=1&pid=ImgDetMain', 'active'),
 (N'Milk foam', N'Milk foam là lớp kem sữa béo ngậy có màu trắng muốt được thêm bên trên bề mặt của trà sữa để tăng thêm độ ngon cho thức uống.', 3000, 3, 'https://th.bing.com/th/id/OIP.WeLQhOjqGOTtPcwwBNAISgHaHa?rs=1&pid=ImgDetMain', 'active'),
 
-(N'Combo Classic', N'1 Trà sữa truyền thống + 1 Trà sữa matcha', 65000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-8.jpg', 'active'),
-(N'Combo Socola Matcha', N'1 Trà sữa socola + 1 Trà sữa matcha + 2 Trân châu đen', 90000, 2, 'https://static.vecteezy.com/system/resources/thumbnails/014/435/706/small_2x/combo-offer-banner-icon-flat-design-flat-illustration-on-white-background-vector.jpg', 'active'),
-(N'Combo Thái Xanh & Mãng Cầu', N'1 Trà sữa Thái xanh + 1 Trà mãng cầu + 2 Trân châu trắng', 85000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-0.jpg', 'active'),
-(N'Combo Trà Sữa 3 Vị', N'1 Trà sữa khoai môn + 1 Trà sữa dâu + 1 Trà sữa Thái xanh + 3 Thạch dừa', 120000, 2, 'https://th.bing.com/th/id/OIP.l7Pa-DvOFOHs_JJ4HN_fKAHaHa?rs=1&pid=ImgDetMain', 'active');
+(N'Combo Classic', N'1 Trà sữa truyền thống(M) + 1 Trà sữa matcha(M)', 65000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-8.jpg', 'active'),
+(N'Combo Socola Matcha', N'1 Trà sữa socola(S) + 1 Trà sữa matcha(S) + 2 Trân châu đen', 80000, 2, 'https://static.vecteezy.com/system/resources/thumbnails/014/435/706/small_2x/combo-offer-banner-icon-flat-design-flat-illustration-on-white-background-vector.jpg', 'active'),
+(N'Combo Thái Xanh & Mãng Cầu', N'1 Trà sữa Thái xanh(M) + 1 Trà mãng cầu(M) + 2 Trân châu trắng', 85000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-0.jpg', 'active'),
+(N'Combo Trà Sữa 3 Vị', N'1 Trà sữa khoai môn(M) + 1 Trà sữa dâu(M) + 1 Trà sữa Thái xanh(M) + 3 Thạch dừa', 120000, 2, 'https://th.bing.com/th/id/OIP.l7Pa-DvOFOHs_JJ4HN_fKAHaHa?rs=1&pid=ImgDetMain', 'active');
 GO
 
 INSERT INTO ProductSize (ProductId, SizeId, Price) VALUES
@@ -167,10 +170,11 @@ INSERT INTO ProductSize (ProductId, SizeId, Price) VALUES
 (8, 1, 30000), (8, 2, 35000), (8, 3, 40000);
 GO
 -- Thêm dữ liệu vào bảng trung gian ProductCombo
-INSERT INTO ProductCombo (ComboId, ProductId, Quantity) VALUES 
-(15, 1, 1), (15, 2, 1), 
-(16, 4, 1), (16, 2, 1), (16, 9, 2), 
-(17, 3, 1), (17, 5, 1), (17, 6, 1), (17, 12, 3);
+INSERT INTO ProductCombo (ComboId, ProductId, Quantity, ProductSizeId) VALUES 
+(15, 1, 1, 2), (15, 2, 1, 5), 
+(16, 4, 1, 10), (16, 2, 1, 4), (16, 9, 2, null), 
+(17, 6, 1, 17), (17, 8, 1, 20), (17, 10, 2, null),
+(18, 3, 1, 8), (18, 5, 1, 14), (18, 6, 1, 17), (18, 12, 3, null);
 GO
 
 -- Thêm dữ liệu mẫu vào bảng Employee

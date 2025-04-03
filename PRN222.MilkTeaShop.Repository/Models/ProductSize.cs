@@ -17,5 +17,7 @@ public partial class ProductSize
 
     public virtual Product Product { get; set; }
 
+    public virtual ICollection<ProductCombo> ProductCombos { get; set; } = new List<ProductCombo>();
+
     public virtual Size Size { get; set; }
 }
