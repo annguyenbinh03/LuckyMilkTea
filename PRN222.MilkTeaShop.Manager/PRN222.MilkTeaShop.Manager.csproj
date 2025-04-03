@@ -18,8 +18,4 @@
     <ProjectReference Include="..\PRN222.MilkTeaShop.Service\PRN222.MilkTeaShop.Service.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Response\" />
-  </ItemGroup>
-
 </Project>

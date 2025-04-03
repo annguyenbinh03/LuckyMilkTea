@@ -28,7 +28,7 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
         public async Task<IActionResult> Index(int? page,
             string? search)
         {
-            int pageSize = 5;
+            int pageSize = 3;
             int pageNumber = (page ?? 1);
 
             var (products, totalItems) = await _productService.GetToppings(search, pageNumber, pageSize);
@@ -52,8 +52,6 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,Price,Image")] ToppingCreationRequest request)
         {
-            int categoryId = 2;
-
 			string? imageUrl = null;
 
             if (request.Image != null && request.Image.Length > 0)
