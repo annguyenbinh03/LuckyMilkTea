@@ -179,57 +179,22 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
 			return RedirectToAction(nameof(Index));
 		}
 
-		//// GET: Combos/Edit/5
-		//public async Task<IActionResult> Edit(int? id)
-		//{
-		//    if (id == null)
-		//    {
-		//        return NotFound();
-		//    }
+        // GET: MilkTeas/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            await _productService.Delete((int)id);
+            return RedirectToAction(nameof(Index));
+        }
 
-		//    var product = await _context.Products.FindAsync(id);
-		//    if (product == null)
-		//    {
-		//        return NotFound();
-		//    }
-		//    ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-		//    return View(product);
-		//}
-
-		//// POST: Combos/Edit/5
-		//// To protect from overposting attacks, enable the specific properties you want to bind to.
-		//// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-		//[HttpPost]
-		//[ValidateAntiForgeryToken]
-		//public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,CategoryId,ImageUrl,SoldCount,Status,CreatedAt,UpdatedAt")] Product product)
-		//{
-		//    if (id != product.Id)
-		//    {
-		//        return NotFound();
-		//    }
-
-		//    if (ModelState.IsValid)
-		//    {
-		//        try
-		//        {
-		//            _context.Update(product);
-		//            await _context.SaveChangesAsync();
-		//        }
-		//        catch (DbUpdateConcurrencyException)
-		//        {
-		//            if (!ProductExists(product.Id))
-		//            {
-		//                return NotFound();
-		//            }
-		//            else
-		//            {
-		//                throw;
-		//            }
-		//        }
-		//        return RedirectToAction(nameof(Index));
-		//    }
-		//    ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-		//    return View(product);
-		//}
-	}
+        // GET: MilkTeas/Active/5	
+        public async Task<IActionResult> Active(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            await _productService.Active((int)id);
+            return RedirectToAction(nameof(Index));
+        }
+    }
 }
