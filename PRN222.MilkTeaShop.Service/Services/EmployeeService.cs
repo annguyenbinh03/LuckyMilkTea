@@ -1,4 +1,6 @@
-﻿using PRN222.MilkTeaShop.Repository.Models;
+﻿using Azure.Core;
+using PRN222.MilkTeaShop.Repository.Enums;
+using PRN222.MilkTeaShop.Repository.Models;
 using PRN222.MilkTeaShop.Repository.UnitOfWork;
 using PRN222.MilkTeaShop.Service.Services.Interface;
 using System;
@@ -18,24 +20,38 @@ namespace PRN222.MilkTeaShop.Service.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task Create(Employee request)
+        public async Task Create(Employee request)
         {
-            throw new NotImplementedException();
+            await _unitOfWork.Employee.AddAsync(request);
+            await _unitOfWork.SaveChanges();
         }
 
-        public Task Delete(int id)
+        public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+             var employee = await _unitOfWork.Employee.GetByIdAsync(id);
+            if(employee != null)
+            {
+                employee.Status = EmployeeStatus.inactive.ToString();
+                _unitOfWork.Employee.Update(employee);
+                await _unitOfWork.SaveChanges();
+            }
         }
 
-        public Task<(IEnumerable<Employee>, int)> GetEmployees(string? search, int? page = null, int? pageSize = null)
+        public async Task<Employee?> GetEmployee(int id)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.Employee.GetByIdAsync(id);
         }
 
-        public Task Update(Employee request)
+        public async Task<(IEnumerable<Employee>, int)> GetEmployees(string? search, int? page = null, int? pageSize = null)
         {
-            throw new NotImplementedException();
+            var (employees, totalItems) = await _unitOfWork.Employee.GetAsync(null, null, null);
+            return (employees, totalItems);
+        }
+
+        public async Task Update(Employee request)
+        {
+            _unitOfWork.Employee.Update(request);
+            await _unitOfWork.SaveChanges();
         }
     }
 }
