@@ -1,60 +1,403 @@
-﻿@page "/products/details"
+﻿@page "/products/details/{Id:int}"
 @using Microsoft.EntityFrameworkCore
 @using PRN222.MilkTeaShop.Repository.Models
 @inject IDbContextFactory<PRN222.MilkTeaShop.Repository.DbContexts.MilkTeaDBContext> DbFactory
 @inject NavigationManager NavigationManager
 
-<PageTitle>Details</PageTitle>
+<PageTitle>Chi tiết sản phẩm</PageTitle>
 
-<h1>Details</h1>
+<div class="product-detail-page">
+    <div class="container">
+        @if (product == null || productSizes == null)
+        {
+            <p><em>Đang tải...</em></p>
+        }
+        else
+        {
+            <div class="product-detail-card">
+                <button type="button" class="btn-close detail-close-button" aria-label="Close" @onclick="NavigateToProducts"></button>
+                <div class="product-image-container">
+                    <img src="@product.ImageUrl" alt="@product.Name" class="product-detail-image" />
+                </div>
 
-<div>
-    <h2>Product</h2>
-    <hr />
-    @if (product is null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else {
-        <dl class="row">
-            <dt class="col-sm-2">Name</dt>
-            <dd class="col-sm-10">@product.Name</dd>
-            <dt class="col-sm-2">Description</dt>
-            <dd class="col-sm-10">@product.Description</dd>
-            <dt class="col-sm-2">Price</dt>
-            <dd class="col-sm-10">@product.Price</dd>
-            <dt class="col-sm-2">CategoryId</dt>
-            <dd class="col-sm-10">@product.CategoryId</dd>
-            <dt class="col-sm-2">ImageUrl</dt>
-            <dd class="col-sm-10">@product.ImageUrl</dd>
-            <dt class="col-sm-2">Status</dt>
-            <dd class="col-sm-10">@product.Status</dd>
-            <dt class="col-sm-2">CreatedAt</dt>
-            <dd class="col-sm-10">@product.CreatedAt</dd>
-            <dt class="col-sm-2">UpdatedAt</dt>
-            <dd class="col-sm-10">@product.UpdatedAt</dd>
-        </dl>
-        <div>
-            <a href="@($"/products/edit?id={product.Id}")">Edit</a> |
-            <a href="@($"/products")">Back to List</a>
-        </div>
-    }
+                <div class="product-info">
+                    <h1 class="product-detail-title">@product.Name</h1>
+                    <div class="product-detail-price">
+                        @string.Format("{0:C}", currentPrice)
+                    </div>
+                    <p class="product-detail-description">@product.Description</p>
+
+                    <hr class="detail-divider" />
+                    <div class="option-group">
+                        <label class="option-label">Chọn size</label>
+                        <div class="option-select">
+                            <select class="form-select" @onchange="OnSizeChange">
+                                @foreach (var productSize in productSizes)
+                                {
+                                    <option  value="@productSize.SizeId">Size @productSize.Size?.Name (@string.Format("{0:C}", productSize.Price))</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <select @onchange="HandleSelectionChange">
+                            <option value="1">Lựa chọn 1</option>
+                            <option value="2">Lựa chọn 2</option>
+                            <option value="3">Lựa chọn 3</option>
+                        </select>
+                    </div>
+
+                    <div class="product-options">
+                        <div class="option-group">
+                            <label class="option-label">Chọn topping</label>
+                            <div class="option-checkboxes">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="topping1" value="Trân châu đen" @onchange="ToggleTopping" />
+                                    <label class="form-check-label" for="topping1">Trân châu đen</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="topping2" value="Trân châu trắng" @onchange="ToggleTopping" />
+                                    <label class="form-check-label" for="topping2">Trân châu trắng</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-actions">
+                        <div class="quantity-control">
+                            <button class="quantity-button" @onclick="DecreaseQuantity">-</button>
+                            <input type="number" class="quantity-input" value="@quantity" readonly />
+                            <button class="quantity-button" @onclick="IncreaseQuantity">+</button>
+                        </div>
+                        <button class="btn btn-primary add-to-cart-button">
+                            <i class="oi oi-cart"></i> Thêm vào giỏ hàng
+                        </button>
+                    </div>
+                    <a class="btn btn-secondary back-button" href="/products">Quay lại</a>
+                </div>
+            </div>
+        }
+    </div>
 </div>
 
 @code {
     private Product? product;
+    private List<ProductSize>? productSizes;
+    private int quantity = 1;
+    private List<string> selectedToppings = new List<string>();
+    private decimal currentPrice = 0;
+    private int selectedSizeId = 0; // Track selected SizeId
 
-    [SupplyParameterFromQuery]
-    private int Id { get; set; }
+    private string selectedId = "0";
+
+    [Parameter]
+    public int Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
-        product = await context.Products.FirstOrDefaultAsync(m => m.Id == Id);
+        using var context = await DbFactory.CreateDbContextAsync();
+        product = await context.Products
+                                .Include(p => p.Category)
+                                .FirstOrDefaultAsync(m => m.Id == Id);
 
         if (product is null)
         {
             NavigationManager.NavigateTo("notfound");
+            return; // Important: Exit if product not found
+        }
+
+        productSizes = await context.ProductSizes
+                                    .Include(ps => ps.Size)
+                                    .Where(ps => ps.ProductId == Id)
+                                    .ToListAsync();
+
+        if (productSizes != null && productSizes.Any())
+        {
+            selectedSizeId = productSizes.First().SizeId; // Default select the first size
+            UpdatePrice(); // Initialize price with default size
+        }
+        else
+        {
+            currentPrice = product.Price ?? 0; // Fallback to product base price if no sizes
         }
     }
+
+    private void NavigateToProducts()
+    {
+        NavigationManager.NavigateTo("/products");
+    }
+
+    private void IncreaseQuantity()
+    {
+        quantity++;
+    }
+
+    private void DecreaseQuantity()
+    {
+        if (quantity > 1)
+        {
+            quantity--;
+        }
+    }
+
+    private void ToggleTopping(ChangeEventArgs e)
+    {
+        var topping = e.Value.ToString();
+        if (selectedToppings.Contains(topping))
+        {
+            selectedToppings.Remove(topping);
+        }
+        else
+        {
+            selectedToppings.Add(topping);
+        }
+    }
+
+    private void OnSizeChange(ChangeEventArgs e)
+    {
+        Console.WriteLine(e.Value);
+        if (int.TryParse(e.Value.ToString(), out int sizeId))
+        {
+            selectedSizeId = sizeId;
+            UpdatePrice();
+        }
+    }
+
+
+    private void UpdatePrice()
+    {
+        if (productSizes != null)
+        {
+            var selectedProductSize = productSizes.FirstOrDefault(ps => ps.SizeId == selectedSizeId);
+            if (selectedProductSize != null)
+            {
+                currentPrice = selectedProductSize.Price;
+            }
+            else
+            {
+                currentPrice = product?.Price ?? 0; // Fallback if size not found
+            }
+        }
+        else
+        {
+            currentPrice = product?.Price ?? 0; // Fallback if no sizes loaded
+        }
+    }
+    private void HandleSelectionChange(ChangeEventArgs e)
+    {
+        string? selectedValue = e.Value.ToString();
+        if (selectedValue != null)
+        {
+            Console.WriteLine($"Giá trị được chọn: {selectedValue}");
+
+        }
+        else
+        {
+            Console.WriteLine($"null");
+        }
+        // Thực hiện các hành động khác dựa trên giá trị được chọn
+    }
 }
+
+<style>
+    .product-detail-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        padding: 20px;
+        overflow: auto;
+    }
+
+    .container {
+        max-width: 1200px;
+        width: 100%;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        display: flex;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .detail-close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #aaa;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    }
+
+        .detail-close-button:hover {
+            opacity: 1;
+            color: #777;
+        }
+
+    .product-image-container {
+        flex: 1;
+        max-width: 250px;
+        max-height: 250px;
+        overflow: hidden;
+    }
+
+    .product-detail-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 15px 0 0 15px;
+        object-fit: cover;
+        max-height: 100%;
+    }
+
+    .product-info {
+        flex: 1;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .product-detail-title {
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .product-detail-price {
+        font-size: 2rem;
+        color: #d9534f;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+
+    .product-detail-description {
+        font-size: 1.2rem;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 25px;
+    }
+
+    .detail-divider {
+        border-top: 1px solid #eee;
+        margin-bottom: 25px;
+    }
+
+    .product-options {
+        margin-bottom: 25px;
+    }
+
+    .option-group {
+        margin-bottom: 15px;
+    }
+
+    .option-label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #555;
+    }
+
+    .option-select .form-select {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    .detail-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+    }
+
+    .quantity-button {
+        background-color: #eee;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        color: #555;
+        transition: background-color 0.3s;
+    }
+
+        .quantity-button:hover {
+            background-color: #ddd;
+        }
+
+    .quantity-input {
+        width: 50px;
+        text-align: center;
+        margin: 0 10px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        appearance: textfield;
+        -webkit-appearance: textfield;
+        -moz-appearance: textfield;
+    }
+
+        .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .quantity-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+    .add-to-cart-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+    }
+
+        .add-to-cart-button:hover {
+            background-color: #0056b3;
+        }
+
+        .add-to-cart-button i {
+            margin-right: 5px;
+        }
+
+    .back-button {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+</style>
+
+

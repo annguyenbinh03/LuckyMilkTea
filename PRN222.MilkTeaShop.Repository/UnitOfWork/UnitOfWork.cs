@@ -22,7 +22,8 @@ namespace PRN222.MilkTeaShop.Repository.UnitOfWork
         private IProductRepository? _productRepository;
         private IGenericRepository<ProductCombo>? _productComboRepository;
         private IGenericRepository<ProductSize>? _productSizeRepository;
-        private IGenericRepository<Size>? _sizeRepository;
+        //private IGenericRepository<Size>? _sizeRepository;
+        private ISizeRepository? _sizeRepository;
 
         public IGenericRepository<Category> Category
         {
@@ -138,13 +139,24 @@ namespace PRN222.MilkTeaShop.Repository.UnitOfWork
             }
         }
 
-        public IGenericRepository<Size> Size
+        //public IGenericRepository<Size> Size
+        //{
+        //    get
+        //    {
+        //        if (this._sizeRepository == null)
+        //        {
+        //            this._sizeRepository = new GenericRepository<Size>(context);
+        //        }
+        //        return _sizeRepository;
+        //    }
+        //}
+        public ISizeRepository Size
         {
             get
             {
                 if (this._sizeRepository == null)
                 {
-                    this._sizeRepository = new GenericRepository<Size>(context);
+                    this._sizeRepository = new SizeRepository(context);
                 }
                 return _sizeRepository;
             }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PRN222.MilkTeaShop.Repository.Models;
+using PRN222.MilkTeaShop.Repository.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace PRN222.MilkTeaShop.Repository.Repositories
 {
-    public class ProductRepository : GenericRepository<Product>, IProductRepository
+	public class ProductRepository : GenericRepository<Product>, IProductRepository
+{
+    public ProductRepository(DbContext context) : base(context)
     {
-        public ProductRepository(DbContext context) : base(context)
-        {
-        }
+    }
 
         public async Task<(IEnumerable<Product>, int)> GetMilkTeas(string? search, int? page = null, int? pageSize = null)
         {
@@ -93,6 +94,15 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
 								 .FirstOrDefault();
 
 			return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == id);
+		}
+
+		public async Task<List<Product>> GetStartMilkTeas()
+		{
+			return await _dbSet
+				.Where(p => p.CategoryId == 1)
+				.Include(p => p.ProductSizes)
+				.ThenInclude(ps => ps.Size)
+				.ToListAsync();
 		}
 	}
 }

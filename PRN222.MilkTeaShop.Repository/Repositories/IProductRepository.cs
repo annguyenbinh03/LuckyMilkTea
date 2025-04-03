@@ -14,5 +14,6 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
         Task<(IEnumerable<Product>, int)> GetToppings(string? search, int? page = null, int? pageSize = null);
 		Task<Product?> GetTopping(int id);
 
-	}
+        Task<List<Product>> GetStartMilkTeas();
+    }
 }

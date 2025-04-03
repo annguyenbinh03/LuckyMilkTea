@@ -2,13 +2,25 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using PRN222.MilkTeaShop.Repository.Models
 @using PRN222.MilkTeaShop.Service.Services
+@using PRN222.MilkTeaShop.Service.Services.Interface
+@using BlazorBootstrap
+
 @implements IAsyncDisposable
 @inject IProductService ProductService
+@inject ISizeService SizeService
+@inject IOrderDetailService OrderDetailService
+@inject IOrderService OrderService
 
+@rendermode InteractiveServer
 <PageTitle>Index</PageTitle>
 
 <h1 class="page-title">Sản Phẩm</h1>
-
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
 <div class="product-container">
     @foreach (var product in products)
     {
@@ -17,20 +29,164 @@
             <div class="product-details">
                 <h3>@product.Name</h3>
                 <p class="text-truncate">@product.Description</p>
-                <p class="product-price">@string.Format("{0:C}", product.Price)</p>
-                <button @onclick="() => AddToCart(product)" class="btn btn-primary product-buy-button"><i class="bi bi-cart-plus"></i></button>
+                @* <p class="product-price">@string.Format("{0:C}", product.Price)</p> *@
+                <Button @onclick="() => OnShowModalClick(product)" class="btn btn-primary product-buy-button">
+                    <i class="bi bi-cart-plus"></i>
+                </Button>
             </div>
         </div>
     }
 </div>
 
+<Modal @ref="modal" Title="Chốt Đơn">
+    <BodyTemplate>
+        @if (selectedProduct != null)
+        {
+            <div>
+                <h3>@selectedProduct.Name</h3>
+                <p>@selectedProduct.Description</p>
+                <img src="@selectedProduct.ImageUrl" alt="@selectedProduct.Name" class="product-image" />
+                <label for="sizeSelect">Chọn Size:</label>
+                <select id="sizeSelect" @bind="selectedSizeId" class="form-control">
+                    @foreach (var size in sizes)
+                    {
+                        <option value="@size.Id">@size.Name</option>
+                    }
+                </select>
+
+                <label>Chọn Topping:</label>
+                <div>
+                    @foreach (var topping in availableToppings)
+                    {
+                        <div>
+                            <input type="checkbox"
+                                   id="@topping.Name"
+                                   value="@topping.Name"
+                                   @onchange="(e) => OnToppingChanged(e, topping)"
+                                   checked="@(selectedToppings.Contains(topping.Name))" />
+                            <label for="@topping.Name">@topping.Name - @string.Format("{0:C}", topping.Price)</label>
+                        </div>
+                    }
+                </div>
+
+                <label>Giá:</label>
+                <div>
+                    <p style="font-size: 20px; font-weight: bold; color: red;">
+                        @string.Format("{0:C}", CalculateTotalPrice())
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>Loading...</p>
+        }
+    </BodyTemplate>
+
+    <FooterTemplate>
+        <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Đóng</Button>
+        <Button Color="ButtonColor.Primary" @onclick="() => AddToCart(selectedProduct, selectedSizeId, selectedToppings, CalculateTotalPrice())">Thanh Toán</Button>
+
+    </FooterTemplate>
+</Modal>
+
+
+
 @code {
+    private string successMessage = string.Empty;
     private List<Product> products = new List<Product>();
+    private List<Size> sizes = new List<Size>();
+    private List<Topping> availableToppings = new List<Topping>
+    {
+        new Topping { Name = "Thạch trái cây", Price = 5000 },
+        new Topping { Name = "Thạch phô mai", Price = 5000 },
+        new Topping { Name = "Thạch củ năng", Price = 7000 },
+        new Topping { Name = "Thạch khoai môn", Price = 8000 },
+        new Topping { Name = "Thạch dừa", Price = 10000 },
+        new Topping { Name = "Sương sáo", Price = 15000 }
+    };
+    private Modal modal = default!;
+    private Product? selectedProduct;
+    private int selectedSizeId = 1;
+    private List<string> selectedToppings = new List<string>();
+
 
     protected override async Task OnInitializedAsync()
     {
-        products = await ProductService.GetAll();
+        products = await ProductService.GetStartMilkTeas();
+
+        sizes = await SizeService.GetListSize();
     }
+    private void OnToppingChanged(ChangeEventArgs e, Topping topping)
+    {
+        if (e.Value is string value && value == topping.Name)
+        {
+            if (selectedToppings.Contains(topping.Name))
+            {
+                selectedToppings.Remove(topping.Name);
+            }
+            else
+            {
+                selectedToppings.Add(topping.Name);
+            }
+            StateHasChanged();
+        }
+    }
+
+    private decimal CalculateTotalPrice()
+    {
+        decimal basePrice = selectedProduct?.ProductSizes
+            .FirstOrDefault(x => x.SizeId == selectedSizeId)?.Price ?? 0;
+
+        decimal toppingsPrice = selectedToppings
+            .Select(toppingName => availableToppings.First(t => t.Name == toppingName).Price)
+            .Sum();
+
+        return basePrice + toppingsPrice;
+    }
+    private async void AddToCart(Product product, int sizeId, List<string> toppings, decimal totalPrice)
+    {
+        string sizeName = sizeId switch
+        {
+            1 => "Nhỏ",
+            2 => "Vừa",
+            3 => "Lớn",
+            _ => "Không xác định"
+        };
+
+        var toppingList = toppings.Any() ? string.Join(", ", toppings) : "Không có topping";
+        // Create Order
+        Order dto = new Order
+        {
+            CreatedAt = DateTime.Now,
+            TotalPrice = totalPrice ,
+            UpdatedAt = DateTime.Now
+        };
+        var result = await OrderService.CreateOrderAsync(dto);
+        
+        // Add into OrderDetail
+        OrderDetail oddetailDto = new OrderDetail
+            {
+                Price = dto.TotalPrice,
+                OrderId = result.Id,
+                ProductId = product.Id,
+                Quantity  = 1,
+                SizeId = sizeId
+            };
+        await OrderDetailService.CreateOrderDetailAsync(oddetailDto);
+        if (result != null)
+        {
+            successMessage = "Đơn hàng đã được tạo thành công!";
+            StateHasChanged();
+            await modal?.HideAsync();
+        }
+        else
+        {
+            successMessage = "Có lỗi khi tạo đơn hàng.";
+            StateHasChanged();
+        }
+    }
+
 
     public async ValueTask DisposeAsync()
     {
@@ -39,6 +195,23 @@
     private void AddToCart(Product product)
     {
         Console.WriteLine($"Sản phẩm {product.Name} đã được thêm vào giỏ hàng!");
+    }
+
+    private async Task OnShowModalClick(Product product)
+    {
+    
+        selectedProduct = product;
+
+        await modal.ShowAsync();
+    }
+    private async Task OnHideModalClick()
+    {
+        await modal?.HideAsync();
+    }
+    public class Topping
+    {
+        public string Name { get; set; }
+        public decimal Price { get; set; }
     }
 }
 
@@ -124,7 +297,15 @@
         align-self: center; /* Center the button */
     }
 
-        .product-buy-button:hover {
-            background-color: #0056b3;
-        }
+    .product-image {
+        width: 100%;
+        height: auto;
+        max-width: 150px;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .product-buy-button:hover {
+        background-color: #0056b3;
+    }
 </style>

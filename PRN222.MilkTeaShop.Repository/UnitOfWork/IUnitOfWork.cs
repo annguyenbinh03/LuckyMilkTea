@@ -19,7 +19,8 @@ namespace PRN222.MilkTeaShop.Repository.UnitOfWork
         IProductRepository Product { get; }
         IGenericRepository<ProductCombo> ProductCombo { get; }
         IGenericRepository<ProductSize> ProductSize { get; }
-        IGenericRepository<Size> Size { get; }
+        ISizeRepository Size { get; }
+
         Task SaveChanges();
     }
 }

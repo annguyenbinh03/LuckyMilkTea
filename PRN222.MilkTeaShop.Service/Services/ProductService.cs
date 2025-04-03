@@ -155,7 +155,7 @@ namespace PRN222.MilkTeaShop.Service.Services
         {
             var (products, totalItems) = await _unitOfWork.Product.GetAsync();
 
-            return products.ToList(); 
+            return products.ToList();
         }
 
         public async Task<(IEnumerable<Product>, int)> GetMilkTeas(string? search, int? page = null, int? pageSize = null)
@@ -189,7 +189,6 @@ namespace PRN222.MilkTeaShop.Service.Services
 
 			await _unitOfWork.SaveChanges();
 		}
-
         public async Task<(IEnumerable<Product>, int)> GetToppings(string? search, int? page = null, int? pageSize = null)
         {
             var (products, totalItems) = await _unitOfWork.Product.GetToppings(search, page, pageSize);
@@ -227,5 +226,16 @@ namespace PRN222.MilkTeaShop.Service.Services
 				throw new Exception(ex.Message);
 			}
 		}
+
+		public async Task<List<Product>> GetStartMilkTeas()
+        {
+            var products = await _unitOfWork.Product.GetStartMilkTeas();
+
+            return products;
+        }
 	}
+
+
+
+ 
 }

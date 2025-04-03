@@ -20,6 +20,8 @@ namespace PRN222.MilkTeaShop.Service.Services
 		Task CreateTopping(ToppingModel model);
 		Task Delete(int id);
 		Task Active(int id);
-	}
+
+        Task<List<Product>> GetStartMilkTeas();
+    }
 }
 
