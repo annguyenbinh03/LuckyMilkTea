@@ -3,31 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PRN222.MilkTeaShop.Repository.DbContexts;
 using PRN222.MilkTeaShop.Repository.Models;
+using PRN222.MilkTeaShop.Repository.Repositories;
 using PRN222.MilkTeaShop.Service.Services.Interface;
 
 namespace PRN222.MilkTeaShop.Service.Services
 {
     public class PaymentService : IPaymentService
     {
-        private readonly MilkTeaDBContext _context;
+        private readonly IPaymentRepository _paymentRepository;
 
-        public PaymentService(MilkTeaDBContext context)
+        public PaymentService(IPaymentRepository paymentRepository)
         {
-            _context = context;
+            _paymentRepository = paymentRepository;
         }
 
-        public async Task<IEnumerable<Payment>> GetPaymentsByOrderIdAsync(int orderId)
+        public async Task<Payment> GetPaymentByIdAsync(int paymentId)
         {
-            return await Task.FromResult(_context.Payments.Where(p => p.OrderId == orderId).ToList());
+            return await _paymentRepository.GetPaymentByIdAsync(paymentId);
         }
 
-        public async Task<Payment> CreatePaymentAsync(Payment payment)
+        public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
         {
-            _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
-            return payment;
+            return await _paymentRepository.GetAllPaymentsAsync();
+        }
+
+        public async Task CreatePaymentAsync(Payment payment)
+        {
+            await _paymentRepository.AddPaymentAsync(payment);
+        }
+
+        public async Task UpdatePaymentAsync(Payment payment)
+        {
+            await _paymentRepository.UpdatePaymentAsync(payment);
+        }
+
+        public async Task DeletePaymentAsync(int paymentId)
+        {
+            await _paymentRepository.DeletePaymentAsync(paymentId);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PRN222.MilkTeaShop.Repository.DbContexts;
+using PRN222.MilkTeaShop.Repository.Repositories;
 using PRN222.MilkTeaShop.Service.Services;
 using PRN222.MilkTeaShop.Service.Services.Interface;
 
@@ -9,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddDbContext<MilkTeaDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
