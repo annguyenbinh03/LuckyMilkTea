@@ -1,17 +1,14 @@
 ﻿@page
 @model PRN222.MilkTeaShop.Staff.Pages.Orders.IndexModel
 @{
-    Layout = "_Layout";  // Sử dụng layout đã tạo ở trên
+    Layout = "_Layout";
 }
-
 
 <h2>Danh sách đơn hàng</h2>
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-    <div class="alert alert-danger">
-        @Model.ErrorMessage
-    </div>
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
 }
 
 <table class="table">
@@ -35,18 +32,77 @@
                 <td>
                     <form method="post" asp-page-handler="UpdateOrderStatus" class="d-inline">
                         <input type="hidden" name="orderId" value="@order.Id" />
-                        <select name="newStatus" class="form-control form-control-sm" required 
-                            @(order.Status == "Completed" || order.Status == "Cancelled" ? "disabled" : "")>
+                        <select name="newStatus" class="form-control form-control-sm" required
+                        @(order.Status == "Completed" || order.Status == "Cancelled" ? "disabled" : "")>
                             <option value="Pending">Pending</option>
                             <option value="Completed">Completed</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
-                        <button type="submit" class="btn btn-warning btn-sm" 
-                            @(order.Status == "Completed" || order.Status == "Cancelled" ? "disabled" : "")>Cập nhật</button>
+                        <button type="submit" class="btn btn-warning btn-sm"
+                        @(order.Status == "Completed" || order.Status == "Cancelled" ? "disabled" : "")>
+                            Cập nhật
+                        </button>
                     </form>
+
                     <a href="/Payments/Create?orderId=@order.Id&amount=@order.TotalPrice" class="btn btn-success">Tạo thanh toán</a>
+
+                    <!-- Nút Chi tiết -->
+                    <button class="btn btn-info btn-sm" onclick="toggleDetails(@order.Id)">Chi tiết</button>
+                </td>
+            </tr>
+            <!-- Vùng hiển thị OrderDetails, mặc định ẩn -->
+            <tr id="orderDetails-@order.Id" style="display: none;">
+                <td colspan="5">
+                    <div id="detailsContent-@order.Id">Đang tải...</div>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    function toggleDetails(orderId) {
+        var detailsRow = document.getElementById("orderDetails-" + orderId);
+        var detailsContent = document.getElementById("detailsContent-" + orderId);
+
+        if (detailsRow.style.display === "none") {
+            detailsRow.style.display = "table-row"; // Hiện vùng chi tiết
+
+            // Gửi request lấy OrderDetails
+            fetch(`/Orders/GetOrderDetails?orderId=${orderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        detailsContent.innerHTML = `
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Size</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.map(od => `
+                                        <tr>
+                                            <td>${od.productName}</td>
+                                            <td>${od.sizeName || "N/A"}</td>
+                                            <td>${od.quantity}</td>
+                                            <td>${od.price}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>`;
+                    } else {
+                        detailsContent.innerHTML = "Không có sản phẩm nào trong đơn hàng này.";
+                    }
+                })
+                .catch(error => {
+                    detailsContent.innerHTML = "Lỗi khi tải dữ liệu!";
+                });
+        } else {
+            detailsRow.style.display = "none"; // Ẩn vùng chi tiết
+        }
+    }
+</script>
