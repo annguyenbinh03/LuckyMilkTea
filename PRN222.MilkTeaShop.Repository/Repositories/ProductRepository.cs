@@ -17,27 +17,29 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
 
         public async Task<(IEnumerable<Product>, int)> GetMilkTeas(string? search, int? page = null, int? pageSize = null)
         {
-            IQueryable<Product> query = _dbSet;
-
-            int totalItems = await query.Where(p => p.CategoryId == 1).CountAsync();
-
-            query = query
-               .Where(p => p.CategoryId == 1)
-               .Include(p => p.ProductSizes)
-               .ThenInclude(ps => ps.Size);
-
-			query = query.OrderBy(p => p.Status).ThenBy(p => p.UpdatedAt).Reverse();
+            IQueryable<Product> query = _dbSet.Where(p => p.CategoryId == 1);
 
 			if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(e => EF.Functions.Like(EF.Property<string>(e, e.Name), $"%{search}%"));
-            }
-            if (page.HasValue && pageSize.HasValue)
+				query = query.Where(e => e.Name.ToLower().Contains(search));
+			}
+
+			int totalItems = await query.CountAsync();
+
+			query = query
+               .Include(p => p.ProductSizes)
+               .ThenInclude(ps => ps.Size);
+
+			query = query
+			.OrderBy(p => p.Status == "active" ? 1 : 0)
+			.ThenBy(p => p.UpdatedAt).Reverse();
+
+			if (page.HasValue && pageSize.HasValue)
             {
                 query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
             }
 
-            return (await query.ToListAsync(), totalItems);
+			return (await query.ToListAsync(), totalItems);
         }
 
         public async Task<Product?> GetMilkTea(int id)

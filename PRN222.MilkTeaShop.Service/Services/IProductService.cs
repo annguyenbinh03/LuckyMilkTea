@@ -15,6 +15,8 @@ namespace PRN222.MilkTeaShop.Service.Services
         public Task CreateMilkTea(MilkTeaModel model);
         public Task UpdateMilkTea(MilkTeaModel model);
 		Task<MilkTeaModel?> GetMilkTea(int id);
+		Task Delete(int id);
+		Task Active(int id);
 	}
 }
 

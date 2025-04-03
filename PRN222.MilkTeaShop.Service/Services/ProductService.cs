@@ -164,6 +164,30 @@ namespace PRN222.MilkTeaShop.Service.Services
             return (products.ToList(), totalItems);
         }
 
-         
-    }
+        public async Task Delete(int id)
+        {
+            Product? product = await _unitOfWork.Product.GetByIdAsync(id);
+
+            if (product == null) return;
+            product.Status = ProductStatus.deleted.ToString();
+			product.UpdatedAt = TimeZoneUtil.GetCurrentTime();
+
+			_unitOfWork.Product.Update(product);
+
+			await _unitOfWork.SaveChanges();
+        }
+
+		public async Task Active(int id)
+		{
+			Product? product = await _unitOfWork.Product.GetByIdAsync(id);
+
+			if (product == null) return;
+			product.Status = ProductStatus.active.ToString();
+			product.UpdatedAt = TimeZoneUtil.GetCurrentTime();
+
+			_unitOfWork.Product.Update(product);
+
+			await _unitOfWork.SaveChanges();
+		}
+	}
 }

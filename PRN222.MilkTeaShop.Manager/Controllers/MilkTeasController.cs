@@ -153,17 +153,19 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
         // GET: MilkTeas/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-
-            return View();
-        }
-
-        // POST: MilkTeas/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-
+            if (id == null)
+                return NotFound();
+            await _productService.Delete((int)id);
             return RedirectToAction(nameof(Index));
-        }
-    }
+		}
+
+		// GET: MilkTeas/Active/5	
+		public async Task<IActionResult> Active(int? id)
+		{
+			if (id == null)
+				return NotFound();
+			await _productService.Active((int)id);
+			return RedirectToAction(nameof(Index));
+		}
+	}
 }
