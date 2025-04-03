@@ -68,7 +68,7 @@ CREATE TABLE Employee (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Username NVARCHAR(50) NOT NULL,
     Password NVARCHAR(50) NOT NULL,
-    Role VARCHAR(10) CHECK (Role IN ('admin', 'staff', 'cashier')),
+    Role VARCHAR(10) CHECK (Role IN ('manager', 'staff', 'cashier')),
     Phone NVARCHAR(15) UNIQUE NOT NULL,
     Email NVARCHAR(255) UNIQUE,
     Status VARCHAR(10) CHECK (Status IN ('active', 'inactive', 'resigned')) DEFAULT 'active',
@@ -180,5 +180,23 @@ GO
 -- Thêm dữ liệu mẫu vào bảng Employee
 INSERT INTO Employee (Username, Password, Role, Phone, Email, Status)
 VALUES 
-('admin', '12345678','admin','0901234567', 'admin1@example.com', 'active');
+('manager', '12345678','manager','0901234567', 'admin1@example.com', 'active'),
+('staff', '12345678','staff','09012345678', 'staff@example.com', 'active');
 GO
+
+INSERT INTO [Order] (TotalPrice, Status, CreatedAt, UpdatedAt)
+VALUES 
+(50000, 'completed', GETDATE(), GETDATE()),  
+(100000, 'completed', GETDATE(), GETDATE()), 
+(75000, 'completed', GETDATE(), GETDATE()); 
+
+INSERT INTO OrderDetail (OrderId, ProductId, Quantity, Price, SizeId, ParentId)
+VALUES 
+(1, 1, 1, 30000, 1, NULL),  
+(1, 4, 1, 35000, 2, NULL),
+(2, 2, 2, 35000, 1, NULL),  
+(2, 5, 1, 37000, 2, NULL),  
+(2, 9, 3, 4000, NULL, NULL), 
+(3, 5, 2, 34000, 1, NULL),  
+(3, 7, 1, 31000, 3, NULL);  
+
