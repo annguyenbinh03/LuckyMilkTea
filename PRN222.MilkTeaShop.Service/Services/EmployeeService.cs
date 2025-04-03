@@ -13,6 +13,11 @@ namespace PRN222.MilkTeaShop.Service.Services
     {
         private readonly IUnitOfWork _unitOfWork;
 
+        public EmployeeService(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
         public Task Create(Employee request)
         {
             throw new NotImplementedException();
