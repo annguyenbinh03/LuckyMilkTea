@@ -13,7 +13,11 @@ public partial class ProductCombo
 
     public int Quantity { get; set; }
 
+    public int? ProductSizeId { get; set; }
+
     public virtual Product Combo { get; set; }
 
     public virtual Product Product { get; set; }
+
+    public virtual ProductSize ProductSize { get; set; }
 }

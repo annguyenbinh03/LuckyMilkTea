@@ -237,6 +237,50 @@ namespace PRN222.MilkTeaShop.Service.Services
         {
             return await _unitOfWork.Product.GetCombosAsync();
         }
+
+        public async Task UpdateTopping(ToppingModel model)
+        {
+            Product? product = await _unitOfWork.Product.GetByIdAsync(model.Id);
+
+            if (product == null) return;
+
+            product.UpdatedAt = TimeZoneUtil.GetCurrentTime();
+
+            if (product.Name != model.Name)
+            {
+                product.Name = model.Name;
+            }
+
+            if (product.Description != model.Description)
+            {
+                product.Description = model.Description;
+            }
+
+            if (product.ImageUrl != model.ImageUrl && !string.IsNullOrEmpty(model.ImageUrl))
+            {
+                product.ImageUrl = model.ImageUrl;
+            }
+
+            if (product.Price != model.Price)
+            {
+                product.Price = model.Price;
+            }
+
+            if (product == null)
+            {
+                throw new Exception("Can not parse product");
+            }
+            try
+            {
+                _unitOfWork.Product.Update(product);
+
+                await _unitOfWork.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 
 

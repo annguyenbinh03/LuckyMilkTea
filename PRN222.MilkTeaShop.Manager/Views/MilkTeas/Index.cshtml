@@ -38,6 +38,9 @@
 				@Html.DisplayNameFor(model => model.First().Status)
 			</th>
 			<th>
+				Lượt bán
+			</th>
+			<th>
 				@Html.DisplayNameFor(model => model.First().UpdatedAt)
 			</th>
 			<th>
@@ -72,30 +75,33 @@
 						@{
 							if (item.Status == "active")
 							{
-								@:<i class="bi bi-check-circle-fill text-success"></i> Đang hoạt động
+								@:<i class="bi bi-check-circle-fill text-success"></i> Đang bán
 							}
 							else
 							{
-								@:<i class="bi bi-x-circle-fill text-danger"></i> Ngừng hoạt động
+								@:<i class="bi bi-x-circle-fill text-danger"></i> Ngừng bán
 							}
 						}
 					</span>
 				</td>
-				<td>
+				<td class="text-center">
+					@Html.DisplayFor(modelItem => item.SoldCount)
+				</td>
+				<td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;">
 					@Html.DisplayFor(modelItem => item.UpdatedAt)
 				</td>
-				<td>
+				<td style="max-width: 150px;">
 					<a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Chỉnh sửa</a>
 
 					@{
 						if (item.Status == "active")
 						{
-							<a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Xóa</a>
+							<a class="btn btn-danger mt-1" asp-action="Delete" asp-route-id="@item.Id">Ngừng bán</a>
 
 						}
 						else
 						{
-							<a class="btn btn-primary" asp-action="Active" asp-route-id="@item.Id">Khôi phục</a>
+							<a class="btn btn-primary mt-1" asp-action="Active" asp-route-id="@item.Id">Bán lại</a>
 						}
 					}
 					

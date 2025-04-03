@@ -56,226 +56,231 @@ public partial class MilkTeaDBContext : DbContext
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		=> optionsBuilder.UseSqlServer(GetConnectionString("DefaultConnection")).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
-	{
-		modelBuilder.Entity<Category>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__Category__3214EC078B2E06FE");
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Category__3214EC07BD08F141");
 
-			entity.ToTable("Category");
+            entity.ToTable("Category");
 
-			entity.HasIndex(e => e.Name, "UQ__Category__737584F61C8B9C92").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__Category__737584F6AAC1579B").IsUnique();
 
-			entity.Property(e => e.Name)
-				.IsRequired()
-				.HasMaxLength(10)
-				.IsUnicode(false);
-		});
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(10)
+                .IsUnicode(false);
+        });
 
-		modelBuilder.Entity<Employee>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__Employee__3214EC0748FC157D");
+        modelBuilder.Entity<Employee>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Employee__3214EC0710966EDF");
 
-			entity.ToTable("Employee");
+            entity.ToTable("Employee");
 
-			entity.HasIndex(e => e.Phone, "UQ__Employee__5C7E359E62AEEE17").IsUnique();
+            entity.HasIndex(e => e.Phone, "UQ__Employee__5C7E359E94C791BD").IsUnique();
 
-			entity.HasIndex(e => e.Email, "UQ__Employee__A9D10534D84E0D43").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Employee__A9D10534ED5DEDD8").IsUnique();
 
-			entity.Property(e => e.CreatedAt)
-				.HasDefaultValueSql("(getdate())")
-				.HasColumnType("datetime");
-			entity.Property(e => e.Email).HasMaxLength(255);
-			entity.Property(e => e.Password)
-				.IsRequired()
-				.HasMaxLength(50);
-			entity.Property(e => e.Phone)
-				.IsRequired()
-				.HasMaxLength(15);
-			entity.Property(e => e.Role)
-				.HasMaxLength(10)
-				.IsUnicode(false);
-			entity.Property(e => e.Status)
-				.HasMaxLength(10)
-				.IsUnicode(false)
-				.HasDefaultValue("active");
-			entity.Property(e => e.UpdatedAt)
-				.HasDefaultValueSql("(getdate())")
-				.HasColumnType("datetime");
-			entity.Property(e => e.Username)
-				.IsRequired()
-				.HasMaxLength(50);
-		});
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Email).HasMaxLength(255);
+            entity.Property(e => e.Password)
+                .IsRequired()
+                .HasMaxLength(50);
+            entity.Property(e => e.Phone)
+                .IsRequired()
+                .HasMaxLength(15);
+            entity.Property(e => e.Role)
+                .HasMaxLength(10)
+                .IsUnicode(false);
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("active");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Username)
+                .IsRequired()
+                .HasMaxLength(50);
+        });
 
-		modelBuilder.Entity<Order>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__Order__3214EC07691659E5");
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Order__3214EC071FCE7D6C");
 
-			entity.ToTable("Order");
+            entity.ToTable("Order");
 
-			entity.Property(e => e.CreatedAt)
-				.HasDefaultValueSql("(getdate())")
-				.HasColumnType("datetime");
-			entity.Property(e => e.Status)
-				.HasMaxLength(10)
-				.IsUnicode(false)
-				.HasDefaultValue("pending");
-			entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
-			entity.Property(e => e.UpdatedAt)
-				.HasDefaultValueSql("(getdate())")
-				.HasColumnType("datetime");
-		});
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("pending");
+            entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+        });
 
-		modelBuilder.Entity<OrderDetail>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__OrderDet__3214EC070874F304");
+        modelBuilder.Entity<OrderDetail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__OrderDet__3214EC0769710BE6");
 
-			entity.ToTable("OrderDetail");
+            entity.ToTable("OrderDetail");
 
-			entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-			entity.Property(e => e.Quantity).HasDefaultValue(1);
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.Quantity).HasDefaultValue(1);
 
-			entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
-				.HasForeignKey(d => d.OrderId)
-				.OnDelete(DeleteBehavior.ClientSetNull)
-				.HasConstraintName("FK__OrderDeta__Order__5EBF139D");
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__OrderDeta__Order__5FB337D6");
 
-			entity.HasOne(d => d.Parent).WithMany(p => p.InverseParent)
-				.HasForeignKey(d => d.ParentId)
-				.HasConstraintName("FK__OrderDeta__Paren__619B8048");
+            entity.HasOne(d => d.Parent).WithMany(p => p.InverseParent)
+                .HasForeignKey(d => d.ParentId)
+                .HasConstraintName("FK__OrderDeta__Paren__628FA481");
 
-			entity.HasOne(d => d.Product).WithMany(p => p.OrderDetails)
-				.HasForeignKey(d => d.ProductId)
-				.OnDelete(DeleteBehavior.ClientSetNull)
-				.HasConstraintName("FK__OrderDeta__Produ__5FB337D6");
+            entity.HasOne(d => d.Product).WithMany(p => p.OrderDetails)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__OrderDeta__Produ__60A75C0F");
 
-			entity.HasOne(d => d.Size).WithMany(p => p.OrderDetails)
-				.HasForeignKey(d => d.SizeId)
-				.HasConstraintName("FK__OrderDeta__SizeI__60A75C0F");
-		});
+            entity.HasOne(d => d.Size).WithMany(p => p.OrderDetails)
+                .HasForeignKey(d => d.SizeId)
+                .HasConstraintName("FK__OrderDeta__SizeI__619B8048");
+        });
 
-		modelBuilder.Entity<Payment>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__Payment__3214EC070B3196FD");
+        modelBuilder.Entity<Payment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Payment__3214EC0781F8EC15");
 
-			entity.ToTable("Payment");
+            entity.ToTable("Payment");
 
-			entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
-			entity.Property(e => e.CreatedAt)
-				.HasDefaultValueSql("(getdate())")
-				.HasColumnType("datetime");
-			entity.Property(e => e.Status)
-				.HasMaxLength(10)
-				.IsUnicode(false)
-				.HasDefaultValue("pending");
-			entity.Property(e => e.TransactionCode).HasMaxLength(50);
+            entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("pending");
+            entity.Property(e => e.TransactionCode).HasMaxLength(50);
 
-			entity.HasOne(d => d.Order).WithMany(p => p.Payments)
-				.HasForeignKey(d => d.OrderId)
-				.OnDelete(DeleteBehavior.ClientSetNull)
-				.HasConstraintName("FK__Payment__OrderId__6B24EA82");
+            entity.HasOne(d => d.Order).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Payment__OrderId__6C190EBB");
 
-			entity.HasOne(d => d.PaymentMethod).WithMany(p => p.Payments)
-				.HasForeignKey(d => d.PaymentMethodId)
-				.OnDelete(DeleteBehavior.ClientSetNull)
-				.HasConstraintName("FK__Payment__Payment__6C190EBB");
-		});
+            entity.HasOne(d => d.PaymentMethod).WithMany(p => p.Payments)
+                .HasForeignKey(d => d.PaymentMethodId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Payment__Payment__6D0D32F4");
+        });
 
-		modelBuilder.Entity<PaymentMethod>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__PaymentM__3214EC07F6A81A5F");
+        modelBuilder.Entity<PaymentMethod>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__PaymentM__3214EC07EA7D3ED2");
 
-			entity.ToTable("PaymentMethod");
+            entity.ToTable("PaymentMethod");
 
-			entity.HasIndex(e => e.Name, "UQ__PaymentM__737584F6E09FDFA8").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__PaymentM__737584F6532FCAA4").IsUnique();
 
-			entity.Property(e => e.Name)
-				.IsRequired()
-				.HasMaxLength(10)
-				.IsUnicode(false);
-		});
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(10)
+                .IsUnicode(false);
+        });
 
-		modelBuilder.Entity<Product>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__Product__3214EC07C58D5736");
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Product__3214EC0711F6CC66");
 
-			entity.ToTable("Product");
+            entity.ToTable("Product");
 
-			entity.Property(e => e.CreatedAt)
-				.HasDefaultValueSql("(getdate())")
-				.HasColumnType("datetime");
-			entity.Property(e => e.ImageUrl).HasMaxLength(500);
-			entity.Property(e => e.Name)
-				.IsRequired()
-				.HasMaxLength(255);
-			entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-			entity.Property(e => e.SoldCount).HasDefaultValue(0);
-			entity.Property(e => e.Status)
-				.HasMaxLength(10)
-				.IsUnicode(false)
-				.HasDefaultValue("active");
-			entity.Property(e => e.UpdatedAt)
-				.HasDefaultValueSql("(getdate())")
-				.HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ImageUrl).HasMaxLength(500);
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.SoldCount).HasDefaultValue(0);
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .IsUnicode(false)
+                .HasDefaultValue("active");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
 
-			entity.HasOne(d => d.Category).WithMany(p => p.Products)
-				.HasForeignKey(d => d.CategoryId)
-				.OnDelete(DeleteBehavior.ClientSetNull)
-				.HasConstraintName("FK__Product__Categor__440B1D61");
-		});
+            entity.HasOne(d => d.Category).WithMany(p => p.Products)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__Product__Categor__440B1D61");
+        });
 
-		modelBuilder.Entity<ProductCombo>(entity =>
-		{
-			entity.HasKey(e => new { e.ComboId, e.ProductId }).HasName("PK__ProductC__1602944291A3E7FD");
+        modelBuilder.Entity<ProductCombo>(entity =>
+        {
+            entity.HasKey(e => new { e.ComboId, e.ProductId }).HasName("PK__ProductC__16029442C84BC8C8");
 
-			entity.ToTable("ProductCombo");
+            entity.ToTable("ProductCombo");
 
-			entity.HasOne(d => d.Combo).WithMany(p => p.ProductComboCombos)
-				.HasForeignKey(d => d.ComboId)
-				.OnDelete(DeleteBehavior.ClientSetNull)
-				.HasConstraintName("FK__ProductCo__Combo__46E78A0C");
+            entity.HasOne(d => d.Combo).WithMany(p => p.ProductComboCombos)
+                .HasForeignKey(d => d.ComboId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductCo__Combo__4BAC3F29");
 
-			entity.HasOne(d => d.Product).WithMany(p => p.ProductComboProducts)
-				.HasForeignKey(d => d.ProductId)
-				.OnDelete(DeleteBehavior.ClientSetNull)
-				.HasConstraintName("FK__ProductCo__Produ__47DBAE45");
-		});
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductComboProducts)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__ProductCo__Produ__4CA06362");
 
-		modelBuilder.Entity<ProductSize>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__ProductS__3214EC0774816010");
+            entity.HasOne(d => d.ProductSize).WithMany(p => p.ProductCombos)
+                .HasForeignKey(d => d.ProductSizeId)
+                .HasConstraintName("FK__ProductCo__Produ__4D94879B");
+        });
 
-			entity.ToTable("ProductSize");
+        modelBuilder.Entity<ProductSize>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ProductS__3214EC07576FBE35");
 
-			entity.HasIndex(e => new { e.ProductId, e.SizeId }, "UQ__ProductS__0C37165B4BFB7A2D").IsUnique();
+            entity.ToTable("ProductSize");
 
-			entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+            entity.HasIndex(e => new { e.ProductId, e.SizeId }, "UQ__ProductS__0C37165B48CC32BA").IsUnique();
 
-			entity.HasOne(d => d.Product).WithMany(p => p.ProductSizes)
-				.HasForeignKey(d => d.ProductId)
-				.HasConstraintName("FK__ProductSi__Produ__4BAC3F29");
-	
-			entity.HasOne(d => d.Size).WithMany(p => p.ProductSizes)
-				.HasForeignKey(d => d.SizeId)
-				.HasConstraintName("FK__ProductSi__SizeI__4CA06362");
-		});
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
 
-		modelBuilder.Entity<Size>(entity =>
-		{
-			entity.HasKey(e => e.Id).HasName("PK__Size__3214EC07E7AE8A3E");
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductSizes)
+                .HasForeignKey(d => d.ProductId)
+                .HasConstraintName("FK__ProductSi__Produ__47DBAE45");
 
-			entity.ToTable("Size");
+            entity.HasOne(d => d.Size).WithMany(p => p.ProductSizes)
+                .HasForeignKey(d => d.SizeId)
+                .HasConstraintName("FK__ProductSi__SizeI__48CFD27E");
+        });
 
-			entity.HasIndex(e => e.Name, "UQ__Size__737584F62CEDA426").IsUnique();
+        modelBuilder.Entity<Size>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Size__3214EC07960E1B59");
 
-			entity.Property(e => e.Name)
-				.IsRequired()
-				.HasMaxLength(10)
-				.IsUnicode(false);
-		});
+            entity.ToTable("Size");
 
-		OnModelCreatingPartial(modelBuilder);
-	}
+            entity.HasIndex(e => e.Name, "UQ__Size__737584F616DFF4EC").IsUnique();
 
-	partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(10)
+                .IsUnicode(false);
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
