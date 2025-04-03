@@ -3,6 +3,7 @@ using PRN222.MilkTeaShop.Repository.DbContexts;
 using PRN222.MilkTeaShop.Repository.Repositories;
 using PRN222.MilkTeaShop.Repository.UnitOfWork;
 using PRN222.MilkTeaShop.Service.Services;
+using PRN222.MilkTeaShop.Service.Services.Interface;
 
 namespace PRN222.MilkTeaShop.Manager;
 
@@ -21,6 +22,7 @@ public class Program
         builder.Services.AddScoped(typeof(GenericRepository<>));
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         builder.Services.AddScoped<IProductService, ProductService>();
+        builder.Services.AddScoped<IEmployeeService, EmployeeService>();
         builder.Services.AddScoped<CloudinaryService>();
 
 		var app = builder.Build();
@@ -42,7 +44,7 @@ public class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=MilkTeas}/{action=Index}");
+            pattern: "{controller=Combos}/{action=Index}");
 
         app.Run();
     }
