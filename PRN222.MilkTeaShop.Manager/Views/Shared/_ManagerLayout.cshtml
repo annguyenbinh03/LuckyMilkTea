@@ -6,18 +6,19 @@
     <title>Lucky Tea Shop</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
     <div class="admin-container">
         <nav class="admin-sidebar">
             <h3>Lucky Milk Tea</h3>
             <ul>
-                <li><a asp-controller="Dashboard">Dashboard</a></li>
-                <li><a asp-controller="MilkTeas">Quản lý trà sữa</a></li>
-                <li><a asp-controller="Toppings">Quản lý topping</a></li>
-                <li><a asp-controller="Combos">Quản lý combo</a></li>
-                <li><a asp-page="/Index">Quản lý nhân viên</a></li>
-                <li><a asp-page="/Index">Quản lý hóa đơn</a></li>
+                <li><a asp-controller="Dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a asp-controller="MilkTeas"><i class="bi bi-cup-straw"></i> Quản lý trà sữa</a></li>
+                <li><a asp-controller="Toppings"><i class="bi bi-share"></i> Quản lý topping</a></li>
+                <li><a asp-controller="Combos"><i class="bi bi-boxes"></i> Quản lý combo</a></li>
+                <li><a asp-page="/Index"><i class="bi bi-person-gear"></i>Quản lý nhân viên</a></li>
+                <li><a asp-page="/Index"><i class="bi bi-receipt"></i>Quản lý hóa đơn</a></li>
             </ul>
         </nav>
         <div class="admin-content">
