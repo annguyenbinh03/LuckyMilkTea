@@ -88,95 +88,86 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
 		}
 
         // GET: Toppings/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var product = await _context.Products.FindAsync(id);
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-        //    return View(product);
-        //}
+			var model = await _productService.GetTopping((int)id);
+			if (model == null)
+            {
+                return NotFound();
+            }
+			var request = new ToppingUpdateRequest
+			{
+				Id = model.Id,
+				Name = model.Name,
+				Description = model.Description,
+				Price = (decimal)model.Price,
+				ImageUrl = model.ImageUrl,
+			};
+			return View(request);
+        }
 
         // POST: Toppings/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,CategoryId,ImageUrl,Status,CreatedAt,UpdatedAt")] Product product)
-        //{
-        //    if (id != product.Id)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Image")] ToppingUpdateRequest request)
+        {
+            if (request.Image != null && request.Image.Length > 0)
+            {
+                string? url = null;
+                using var stream = request.Image.OpenReadStream();
+                url = await _cloudinaryService.UploadImageAsync(stream, request.Name);
+                if (url == null)
+                {
+                    ModelState.AddModelError("Image", "Không thể tải ảnh lên.");
+                    return View(request);
+                }
+                request.ImageUrl = url;
+            }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(product);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!ProductExists(product.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-        //    return View(product);
-        //}
+            var model = new ToppingModel
+            {
+                Id = request.Id,
+                Name = request.Name,
+                Description = request.Description,
+                ImageUrl = request.ImageUrl,
+                Price = request.Price
+            };
+            try
+            {
+                await _productService.UpdateTopping(model);
+            }
+            catch (Exception e)
+            {
+                ViewBag.Error = e.Message;
+                return View(request);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
 
         // GET: Toppings/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            await _productService.Delete((int)id);
+            return RedirectToAction(nameof(Index));
+        }
 
-        //    var product = await _context.Products
-        //        .Include(p => p.Category)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(product);
-        //}
-
-        // POST: Toppings/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var product = await _context.Products.FindAsync(id);
-        //    if (product != null)
-        //    {
-        //        _context.Products.Remove(product);
-        //    }
-
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        //private bool ProductExists(int id)
-        //{
-        //    return _context.Products.Any(e => e.Id == id);
-        //}
+        // GET: Toppings/Active/5	
+        public async Task<IActionResult> Active(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            await _productService.Active((int)id);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
