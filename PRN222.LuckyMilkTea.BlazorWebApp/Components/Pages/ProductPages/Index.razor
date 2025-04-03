@@ -5,7 +5,6 @@
 @using PRN222.MilkTeaShop.Service.Services.Interface
 @using BlazorBootstrap
 
-@implements IAsyncDisposable
 @inject IProductService ProductService
 @inject ISizeService SizeService
 @inject IOrderDetailService OrderDetailService
@@ -29,7 +28,6 @@
             <div class="product-details">
                 <h3>@product.Name</h3>
                 <p class="text-truncate">@product.Description</p>
-                @* <p class="product-price">@string.Format("{0:C}", product.Price)</p> *@
                 <Button @onclick="() => OnShowModalClick(product)" class="btn btn-primary product-buy-button">
                     <i class="bi bi-cart-plus"></i>
                 </Button>
@@ -46,35 +44,66 @@
                 <h3>@selectedProduct.Name</h3>
                 <p>@selectedProduct.Description</p>
                 <img src="@selectedProduct.ImageUrl" alt="@selectedProduct.Name" class="product-image" />
-                <label for="sizeSelect">Chọn Size:</label>
-                <select id="sizeSelect" @bind="selectedSizeId" class="form-control">
-                    @foreach (var size in sizes)
-                    {
-                        <option value="@size.Id">@size.Name</option>
-                    }
-                </select>
 
-                <label>Chọn Topping:</label>
-                <div>
-                    @foreach (var topping in availableToppings)
-                    {
-                        <div>
-                            <input type="checkbox"
-                                   id="@topping.Name"
-                                   value="@topping.Name"
-                                   @onchange="(e) => OnToppingChanged(e, topping)"
-                                   checked="@(selectedToppings.Contains(topping.Name))" />
-                            <label for="@topping.Name">@topping.Name - @string.Format("{0:C}", topping.Price)</label>
-                        </div>
-                    }
-                </div>
+                @if (selectedProduct.CategoryId == 1) // Trà sữa
+                {
+                    <label for="sizeSelect">Chọn Size:</label>
+                    <select id="sizeSelect" @bind="selectedSizeId" class="form-control">
+                        @foreach (var size in sizes)
+                        {
+                            var sizePrice = selectedProduct.ProductSizes.FirstOrDefault(ps => ps.SizeId == size.Id)?.Price ?? 0;
+                            <option value="@size.Id">@size.Name - @string.Format("{0:C}", sizePrice)</option>
+                        }
+                    </select>
 
-                <label>Giá:</label>
-                <div>
-                    <p style="font-size: 20px; font-weight: bold; color: red;">
-                        @string.Format("{0:C}", CalculateTotalPrice())
-                    </p>
-                </div>
+                    <label>Chọn Topping:</label>
+                    <div>
+                        @foreach (var topping in availableToppings)
+                        {
+                            <div>
+                                <input type="checkbox"
+                                       id="topping-@topping.Id"
+                                       value="@topping.Id"
+                                       @onchange="(e) => OnToppingChanged(e, topping)"
+                                       checked="@(selectedToppings.Contains(topping.Id.ToString()))" />
+                                <label for="topping-@topping.Id">@topping.Name - @string.Format("{0:C}", topping.Price)</label>
+                            </div>
+                        }
+                    </div>
+
+                    <label>Giá:</label>
+                    <div>
+                        <p style="font-size: 20px; font-weight: bold; color: red;">
+                            @string.Format("{0:C}", CalculateTotalPrice())
+                        </p>
+                    </div>
+                }
+                else if (selectedProduct.CategoryId == 2) // Combo
+                {
+                    <label>Chi tiết Combo:</label>
+                    <div>
+                        @foreach (var comboItem in selectedProduct.ProductComboCombos) // Sử dụng ProductComboCombos
+                        {
+                            <div>
+                                <p>
+                                    @comboItem.Product.Name
+                                    @if (comboItem.ProductSize != null)
+                                    {
+                                        <span>(@comboItem.ProductSize.Size.Name)</span>
+                                    }
+                                    - Số lượng: @comboItem.Quantity
+                                </p>
+                            </div>
+                        }
+                    </div>
+
+                    <label>Giá:</label>
+                    <div>
+                        <p style="font-size: 20px; font-weight: bold; color: red;">
+                            @string.Format("{0:C}", selectedProduct.Price)
+                        </p>
+                    </div>
+                }
             </div>
         }
         else
@@ -85,49 +114,38 @@
 
     <FooterTemplate>
         <Button Color="ButtonColor.Secondary" @onclick="OnHideModalClick">Đóng</Button>
-        <Button Color="ButtonColor.Primary" @onclick="() => AddToCart(selectedProduct, selectedSizeId, selectedToppings, CalculateTotalPrice())">Thanh Toán</Button>
-
+        <Button Color="ButtonColor.Primary" @onclick="() => AddToCart(selectedProduct, selectedSizeId, selectedToppings, CalculateTotalPrice())">Thêm vào giỏ hàng</Button>
     </FooterTemplate>
 </Modal>
-
-
 
 @code {
     private string successMessage = string.Empty;
     private List<Product> products = new List<Product>();
     private List<Size> sizes = new List<Size>();
-    private List<Topping> availableToppings = new List<Topping>
-    {
-        new Topping { Name = "Thạch trái cây", Price = 5000 },
-        new Topping { Name = "Thạch phô mai", Price = 5000 },
-        new Topping { Name = "Thạch củ năng", Price = 7000 },
-        new Topping { Name = "Thạch khoai môn", Price = 8000 },
-        new Topping { Name = "Thạch dừa", Price = 10000 },
-        new Topping { Name = "Sương sáo", Price = 15000 }
-    };
+    private List<Product> availableToppings = new List<Product>();
     private Modal modal = default!;
     private Product? selectedProduct;
     private int selectedSizeId = 1;
     private List<string> selectedToppings = new List<string>();
 
-
     protected override async Task OnInitializedAsync()
     {
         products = await ProductService.GetStartMilkTeas();
-
         sizes = await SizeService.GetListSize();
+        availableToppings = await ProductService.GetToppingAsync();
     }
-    private void OnToppingChanged(ChangeEventArgs e, Topping topping)
+
+    private void OnToppingChanged(ChangeEventArgs e, Product topping)
     {
-        if (e.Value is string value && value == topping.Name)
+        if (e.Value is bool isChecked)
         {
-            if (selectedToppings.Contains(topping.Name))
+            if (isChecked && !selectedToppings.Contains(topping.Id.ToString()))
             {
-                selectedToppings.Remove(topping.Name);
+                selectedToppings.Add(topping.Id.ToString());
             }
-            else
+            else if (!isChecked && selectedToppings.Contains(topping.Id.ToString()))
             {
-                selectedToppings.Add(topping.Name);
+                selectedToppings.Remove(topping.Id.ToString());
             }
             StateHasChanged();
         }
@@ -135,83 +153,122 @@
 
     private decimal CalculateTotalPrice()
     {
-        decimal basePrice = selectedProduct?.ProductSizes
-            .FirstOrDefault(x => x.SizeId == selectedSizeId)?.Price ?? 0;
+        if (selectedProduct == null) return 0;
 
-        decimal toppingsPrice = selectedToppings
-            .Select(toppingName => availableToppings.First(t => t.Name == toppingName).Price)
-            .Sum();
+        decimal basePrice = 0;
+        if (selectedProduct.CategoryId == 1) // Trà sữa
+        {
+            basePrice = selectedProduct.ProductSizes
+                .FirstOrDefault(x => x.SizeId == selectedSizeId)?.Price ?? 0;
 
-        return basePrice + toppingsPrice;
+            decimal toppingsPrice = selectedToppings
+                .Select(toppingId => availableToppings.First(t => t.Id.ToString() == toppingId).Price ?? 0)
+                .Sum();
+
+            return basePrice + toppingsPrice;
+        }
+        else if (selectedProduct.CategoryId == 2) // Combo
+        {
+            return selectedProduct.Price ?? 0;
+        }
+
+        return basePrice;
     }
-    private async void AddToCart(Product product, int sizeId, List<string> toppings, decimal totalPrice)
-    {
-        string sizeName = sizeId switch
-        {
-            1 => "Nhỏ",
-            2 => "Vừa",
-            3 => "Lớn",
-            _ => "Không xác định"
-        };
 
-        var toppingList = toppings.Any() ? string.Join(", ", toppings) : "Không có topping";
-        // Create Order
-        Order dto = new Order
+    private async Task AddToCart(Product product, int sizeId, List<string> toppings, decimal totalPrice)
+    {
+        try
         {
-            CreatedAt = DateTime.Now,
-            TotalPrice = totalPrice ,
-            UpdatedAt = DateTime.Now
-        };
-        var result = await OrderService.CreateOrderAsync(dto);
-        
-        // Add into OrderDetail
-        OrderDetail oddetailDto = new OrderDetail
+            // Tạo Order
+            Order order = new Order
+                {
+                    CreatedAt = DateTime.Now,
+                    TotalPrice = totalPrice,
+                    UpdatedAt = DateTime.Now,
+                    Status = "pending"
+                };
+            var createdOrder = await OrderService.CreateOrderAsync(order);
+            if (createdOrder == null)
             {
-                Price = dto.TotalPrice,
-                OrderId = result.Id,
-                ProductId = product.Id,
-                Quantity  = 1,
-                SizeId = sizeId
-            };
-        await OrderDetailService.CreateOrderDetailAsync(oddetailDto);
-        if (result != null)
-        {
+                successMessage = "Có lỗi khi tạo đơn hàng.";
+                StateHasChanged();
+                return;
+            }
+
+            // Tạo OrderDetail cho sản phẩm chính
+            decimal productPrice = product.CategoryId == 1
+                ? product.ProductSizes.FirstOrDefault(x => x.SizeId == sizeId)?.Price ?? 0
+                : product.Price ?? 0;
+
+            OrderDetail orderDetail = new OrderDetail
+                {
+                    OrderId = createdOrder.Id,
+                    ProductId = product.Id,
+                    Quantity = 1,
+                    Price = productPrice,
+                    SizeId = product.CategoryId == 1 ? sizeId : null
+                };
+            await OrderDetailService.CreateOrderDetailAsync(orderDetail);
+
+            // Tạo OrderDetail cho topping (chỉ áp dụng cho trà sữa)
+            if (product.CategoryId == 1)
+            {
+                foreach (var toppingId in toppings)
+                {
+                    var topping = availableToppings.FirstOrDefault(t => t.Id.ToString() == toppingId);
+                    if (topping != null)
+                    {
+                        OrderDetail toppingDetail = new OrderDetail
+                            {
+                                OrderId = createdOrder.Id,
+                                ProductId = topping.Id,
+                                Quantity = 1,
+                                Price = topping.Price ?? 0,
+                                ParentId = orderDetail.Id
+                            };
+                        await OrderDetailService.CreateOrderDetailAsync(toppingDetail);
+                    }
+                }
+            }
+            // Tạo OrderDetail cho các sản phẩm trong combo (nếu là combo)
+            else if (product.CategoryId == 2)
+            {
+                foreach (var comboItem in product.ProductComboCombos) // Sử dụng ProductComboCombos
+                {
+                    OrderDetail comboItemDetail = new OrderDetail
+                        {
+                            OrderId = createdOrder.Id,
+                            ProductId = comboItem.ProductId,
+                            Quantity = comboItem.Quantity,
+                            Price = comboItem.Product.ProductSizes.FirstOrDefault(ps => ps.SizeId == comboItem.ProductSize?.SizeId)?.Price ?? 0,
+                            SizeId = comboItem.ProductSize?.SizeId,
+                            ParentId = orderDetail.Id
+                        };
+                    await OrderDetailService.CreateOrderDetailAsync(comboItemDetail);
+                }
+            }
+
             successMessage = "Đơn hàng đã được tạo thành công!";
-            StateHasChanged();
             await modal?.HideAsync();
         }
-        else
+        catch (Exception ex)
         {
-            successMessage = "Có lỗi khi tạo đơn hàng.";
-            StateHasChanged();
+            successMessage = $"Có lỗi khi tạo đơn hàng: {ex.Message}";
         }
-    }
-
-
-    public async ValueTask DisposeAsync()
-    {
-    }
-
-    private void AddToCart(Product product)
-    {
-        Console.WriteLine($"Sản phẩm {product.Name} đã được thêm vào giỏ hàng!");
+        StateHasChanged();
     }
 
     private async Task OnShowModalClick(Product product)
     {
-    
         selectedProduct = product;
-
+        selectedToppings.Clear();
+        selectedSizeId = sizes.FirstOrDefault()?.Id ?? 1;
         await modal.ShowAsync();
     }
+
     private async Task OnHideModalClick()
     {
         await modal?.HideAsync();
-    }
-    public class Topping
-    {
-        public string Name { get; set; }
-        public decimal Price { get; set; }
     }
 }
 
@@ -237,8 +294,8 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         text-align: center;
         padding: 15px;
-        display: flex; /* Use flexbox to control layout */
-        flex-direction: column; /* Stack elements vertically */
+        display: flex;
+        flex-direction: column;
         transition: transform 0.3s, box-shadow 0.3s;
     }
 
@@ -249,39 +306,32 @@
 
     .product-image {
         width: 100%;
-        height: 200px; /* Fixed height for consistency */
-        object-fit: cover; /* Ensure image scales properly */
+        height: 200px;
+        object-fit: cover;
         border-radius: 10px;
     }
 
     .product-details {
         margin-top: 15px;
-        flex-grow: 1; /* Allow details to take available space */
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* Space out the content */
+        justify-content: space-between;
     }
 
         .product-details h3 {
             font-size: 1.5rem;
             font-weight: bold;
             color: #333;
-            margin-bottom: 8px; /* Add spacing below the title */
+            margin-bottom: 8px;
         }
 
         .product-details p {
             font-size: 1rem;
             color: #777;
             margin-bottom: 10px;
-            flex-grow: 1; /* Allow description to take space */
+            flex-grow: 1;
         }
-
-    .product-price {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #d9534f;
-        margin-bottom: 15px; /* Add spacing above the button */
-    }
 
     .product-buy-button {
         padding: 10px;
@@ -294,7 +344,7 @@
         height: 50px;
         cursor: pointer;
         transition: background-color 0.3s;
-        align-self: center; /* Center the button */
+        align-self: center;
     }
 
     .product-image {
