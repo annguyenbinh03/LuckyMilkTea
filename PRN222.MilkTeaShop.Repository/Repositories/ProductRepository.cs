@@ -96,13 +96,13 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
 			return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == id);
 		}
 
-		public async Task<List<Product>> GetStartMilkTeas()
-		{
-			return await _dbSet
-				.Where(p => p.CategoryId == 1)
-				.Include(p => p.ProductSizes)
-				.ThenInclude(ps => ps.Size)
-				.ToListAsync();
-		}
-	}
+        public async Task<List<Product>> GetStartMilkTeas()
+        {
+            return await _dbSet
+                .Where(p => p.CategoryId == 1 || p.CategoryId == 2)
+                .Include(p => p.ProductSizes)
+                .ThenInclude(ps => ps.Size)
+                .ToListAsync();
+        }
+    }
 }
