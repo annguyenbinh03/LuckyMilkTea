@@ -22,7 +22,6 @@ namespace PRN222.MilkTeaShop.Staff.Pages.Payments
         public async Task OnGetAsync()
         {
             Payments = (List<Payment>)await _paymentService.GetAllPaymentsAsync();
-            Console.WriteLine(Payments[0].Amount);
         }
         public async Task<IActionResult> OnPostUpdateStatusAsync(int paymentId, string newStatus)
         {
