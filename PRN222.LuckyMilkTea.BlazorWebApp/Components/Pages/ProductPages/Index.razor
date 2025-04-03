@@ -4,11 +4,13 @@
 @using PRN222.MilkTeaShop.Service.Services
 @using PRN222.MilkTeaShop.Service.Services.Interface
 @using BlazorBootstrap
-
+@using PRN222.LuckyMilkTea.BlazorWebApp.Service
 @inject IProductService ProductService
 @inject ISizeService SizeService
 @inject IOrderDetailService OrderDetailService
 @inject IOrderService OrderService
+@inject CartService CartService
+@inject NavigationManager Navigation
 
 @rendermode InteractiveServer
 <PageTitle>Index</PageTitle>
@@ -16,7 +18,7 @@
 <h1 class="page-title">Sản Phẩm</h1>
 @if (!string.IsNullOrEmpty(successMessage))
 {
-    <div class="alert alert-success" role="alert">
+    <div class="alert alert-success fade show" role="alert">
         @successMessage
     </div>
 }
@@ -28,6 +30,17 @@
             <div class="product-details">
                 <h3>@product.Name</h3>
                 <p class="text-truncate">@product.Description</p>
+                <p class="product-price">
+                    @if (product.CategoryId == 1)
+                    {
+                        var minPrice = product.ProductSizes.OrderBy(ps => ps.Price).FirstOrDefault()?.Price ?? 0;
+                        <span>Từ @string.Format("{0:C}", minPrice)</span>
+                    }
+                    else if (product.CategoryId == 2)
+                    {
+                        <span>@string.Format("{0:C}", product.Price)</span>
+                    }
+                </p>
                 <Button @onclick="() => OnShowModalClick(product)" class="btn btn-primary product-buy-button">
                     <i class="bi bi-cart-plus"></i>
                 </Button>
@@ -40,74 +53,98 @@
     <BodyTemplate>
         @if (selectedProduct != null)
         {
-            <div>
-                <h3>@selectedProduct.Name</h3>
-                <p>@selectedProduct.Description</p>
-                <img src="@selectedProduct.ImageUrl" alt="@selectedProduct.Name" class="product-image" />
+            <div class="modal-content-wrapper">
+                <div class="product-header">
+                    <h3>@selectedProduct.Name</h3>
+                    <p>@selectedProduct.Description</p>
+                    <img src="@selectedProduct.ImageUrl" alt="@selectedProduct.Name" class="product-image" />
+                </div>
+
+                <!-- Quantity Selector -->
+                <div class="option-section">
+                    <label>Số lượng:</label>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" @onclick="DecreaseQuantity">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                        <span class="quantity-value">@quantity</span>
+                        <button class="quantity-btn" @onclick="IncreaseQuantity">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
 
                 @if (selectedProduct.CategoryId == 1) // Trà sữa
                 {
-                    <label for="sizeSelect">Chọn Size:</label>
-                    <select id="sizeSelect" @bind="selectedSizeId" class="form-control">
-                        @foreach (var size in sizes)
-                        {
-                            var sizePrice = selectedProduct.ProductSizes.FirstOrDefault(ps => ps.SizeId == size.Id)?.Price ?? 0;
-                            <option value="@size.Id">@size.Name - @string.Format("{0:C}", sizePrice)</option>
-                        }
-                    </select>
-
-                    <label>Chọn Topping:</label>
-                    <div>
-                        @foreach (var topping in availableToppings)
-                        {
-                            <div>
-                                <input type="checkbox"
-                                       id="topping-@topping.Id"
-                                       value="@topping.Id"
-                                       @onchange="(e) => OnToppingChanged(e, topping)"
-                                       checked="@(selectedToppings.Contains(topping.Id.ToString()))" />
-                                <label for="topping-@topping.Id">@topping.Name - @string.Format("{0:C}", topping.Price)</label>
-                            </div>
-                        }
+                    <div class="option-section">
+                        <label for="sizeSelect">Chọn Size:</label>
+                        <select id="sizeSelect" @bind="selectedSizeId" class="form-control">
+                            @foreach (var size in sizes)
+                            {
+                                var sizePrice = selectedProduct.ProductSizes.FirstOrDefault(ps => ps.SizeId == size.Id)?.Price ?? 0;
+                                <option value="@size.Id">@size.Name - @string.Format("{0:C}", sizePrice)</option>
+                            }
+                        </select>
                     </div>
 
-                    <label>Giá:</label>
-                    <div>
-                        <p style="font-size: 20px; font-weight: bold; color: red;">
-                            @string.Format("{0:C}", CalculateTotalPrice())
-                        </p>
+                    <div class="option-section">
+                        <label>Chọn Topping:</label>
+                        <div class="topping-list">
+                            @foreach (var topping in availableToppings)
+                            {
+                                <div class="topping-item">
+                                    <img src="@topping.ImageUrl" alt="@topping.Name" class="topping-image" />
+                                    <div class="topping-details">
+                                        <label for="topping-@topping.Id">
+                                            @topping.Name
+                                            <span class="topping-price">@string.Format("{0:C}", topping.Price)</span>
+                                        </label>
+                                    </div>
+                                    <input type="checkbox"
+                                           id="topping-@topping.Id"
+                                           value="@topping.Id"
+                                           @onchange="(e) => OnToppingChanged(e, topping)"
+                                           checked="@(selectedToppings.Contains(topping.Id.ToString()))" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="price-section">
+                        <label>Giá:</label>
+                        <p class="total-price">@string.Format("{0:C}", CalculateTotalPrice())</p>
                     </div>
                 }
                 else if (selectedProduct.CategoryId == 2) // Combo
                 {
-                    <label>Chi tiết Combo:</label>
-                    <div class="combo-items">
-                        @foreach (var comboItem in selectedProduct.ProductComboCombos) // Sử dụng ProductComboCombos
-                        {
-                            <div class="combo-item">
-                                <img src="@comboItem.Product.ImageUrl" alt="@comboItem.Product.Name" class="combo-item-image" />
-                                <div class="combo-item-details">
-                                    <p>
-                                        <strong>@comboItem.Product.Name</strong>
-                                        @if (comboItem.ProductSize != null)
-                                        {
-                                            <span>(@comboItem.ProductSize.Size.Name)</span>
-                                        }
-                                        - Số lượng: @comboItem.Quantity
-                                    </p>
-                                    <p>
-                                        Giá: @string.Format("{0:C}", (comboItem.ProductSize?.Price ?? comboItem.Product.Price ?? 0) * comboItem.Quantity)
-                                    </p>
+                    <div class="option-section">
+                        <label>Chi tiết Combo:</label>
+                        <div class="combo-items">
+                            @foreach (var comboItem in selectedProduct.ProductComboCombos)
+                            {
+                                <div class="combo-item">
+                                    <img src="@comboItem.Product.ImageUrl" alt="@comboItem.Product.Name" class="combo-item-image" />
+                                    <div class="combo-item-details">
+                                        <p>
+                                            <strong>@comboItem.Product.Name</strong>
+                                            @if (comboItem.ProductSize != null)
+                                            {
+                                                <span>(@comboItem.ProductSize.Size.Name)</span>
+                                            }
+                                            - Số lượng: @comboItem.Quantity
+                                        </p>
+                                        <p class="combo-item-price">
+                                            Giá: @string.Format("{0:C}", (comboItem.ProductSize?.Price ?? comboItem.Product.Price ?? 0) * comboItem.Quantity)
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
                     </div>
 
-                    <label>Giá Tổng:</label>
-                    <div>
-                        <p style="font-size: 20px; font-weight: bold; color: red;">
-                            @string.Format("{0:C}", selectedProduct.Price)
-                        </p>
+                    <div class="price-section">
+                        <label>Giá Tổng:</label>
+                        <p class="total-price">@string.Format("{0:C}", selectedProduct.Price * quantity)</p>
                     </div>
                 }
             </div>
@@ -133,12 +170,26 @@
     private Product? selectedProduct;
     private int selectedSizeId = 1;
     private List<string> selectedToppings = new List<string>();
+    private int quantity = 1;
 
     protected override async Task OnInitializedAsync()
     {
         products = await ProductService.GetStartMilkTeas();
         sizes = await SizeService.GetListSize();
         availableToppings = await ProductService.GetToppingAsync();
+    }
+
+    private void IncreaseQuantity()
+    {
+        quantity++;
+    }
+
+    private void DecreaseQuantity()
+    {
+        if (quantity > 1)
+        {
+            quantity--;
+        }
     }
 
     private void OnToppingChanged(ChangeEventArgs e, Product topping)
@@ -171,11 +222,11 @@
                 .Select(toppingId => availableToppings.First(t => t.Id.ToString() == toppingId).Price ?? 0)
                 .Sum();
 
-            return basePrice + toppingsPrice;
+            return (basePrice + toppingsPrice) * quantity;
         }
         else if (selectedProduct.CategoryId == 2) // Combo
         {
-            return selectedProduct.Price ?? 0;
+            return (selectedProduct.Price ?? 0) * quantity;
         }
 
         return basePrice;
@@ -183,85 +234,22 @@
 
     private async Task AddToCart(Product product, int sizeId, List<string> toppings, decimal totalPrice)
     {
-        try
+        string sizeName = sizes.FirstOrDefault(s => s.Id == selectedSizeId)?.Name ?? "Unknown Size";
+        if (product.CategoryId == 2)
         {
-            // Tạo Order
-            Order order = new Order
-            {
-                CreatedAt = DateTime.Now,
-                TotalPrice = totalPrice,
-                UpdatedAt = DateTime.Now,
-                Status = "pending"
-            };
-            var createdOrder = await OrderService.CreateOrderAsync(order);
-            if (createdOrder == null)
-            {
-                successMessage = "Có lỗi khi tạo đơn hàng.";
-                StateHasChanged();
-                return;
-            }
-
-            // Tạo OrderDetail cho sản phẩm chính
-            decimal productPrice = product.CategoryId == 1
-                ? product.ProductSizes.FirstOrDefault(x => x.SizeId == sizeId)?.Price ?? 0
-                : product.Price ?? 0;
-
-            OrderDetail orderDetail = new OrderDetail
-            {
-                OrderId = createdOrder.Id,
-                ProductId = product.Id,
-                Quantity = 1,
-                Price = productPrice,
-                SizeId = product.CategoryId == 1 ? sizeId : null
-            };
-            await OrderDetailService.CreateOrderDetailAsync(orderDetail);
-
-            // Tạo OrderDetail cho topping (chỉ áp dụng cho trà sữa)
-            if (product.CategoryId == 1)
-            {
-                foreach (var toppingId in toppings)
-                {
-                    var topping = availableToppings.FirstOrDefault(t => t.Id.ToString() == toppingId);
-                    if (topping != null)
-                    {
-                        OrderDetail toppingDetail = new OrderDetail
-                        {
-                            OrderId = createdOrder.Id,
-                            ProductId = topping.Id,
-                            Quantity = 1,
-                            Price = topping.Price ?? 0,
-                            ParentId = orderDetail.Id
-                        };
-                        await OrderDetailService.CreateOrderDetailAsync(toppingDetail);
-                    }
-                }
-            }
-            // Tạo OrderDetail cho các sản phẩm trong combo (nếu là combo)
-            else if (product.CategoryId == 2)
-            {
-                foreach (var comboItem in product.ProductComboCombos)
-                {
-                    OrderDetail comboItemDetail = new OrderDetail
-                    {
-                        OrderId = createdOrder.Id,
-                        ProductId = comboItem.ProductId,
-                        Quantity = comboItem.Quantity,
-                        Price = comboItem.Product.ProductSizes.FirstOrDefault(ps => ps.SizeId == comboItem.ProductSize?.SizeId)?.Price ?? comboItem.Product.Price ?? 0,
-                        SizeId = comboItem.ProductSize?.SizeId,
-                        ParentId = orderDetail.Id
-                    };
-                    await OrderDetailService.CreateOrderDetailAsync(comboItemDetail);
-                }
-            }
-
-            successMessage = "Đơn hàng đã được tạo thành công!";
-            await modal?.HideAsync();
+            sizeName = product.Name;
         }
-        catch (Exception ex)
-        {
-            successMessage = $"Có lỗi khi tạo đơn hàng: {ex.Message}";
-        }
+
+        // Tính totalPrice đúng với số lượng
+        decimal itemTotalPrice = CalculateTotalPrice(); // Đã bao gồm quantity
+
+        CartService.AddToCart(product, sizeId, sizeName, toppings, itemTotalPrice, quantity); // Thêm quantity vào
+        successMessage = "Sản phẩm đã được thêm vào giỏ hàng!";
         StateHasChanged();
+        await Task.Delay(1000);
+        successMessage = string.Empty;
+        StateHasChanged();
+        await modal?.HideAsync();
     }
 
     private async Task OnShowModalClick(Product product)
@@ -269,6 +257,7 @@
         selectedProduct = product;
         selectedToppings.Clear();
         selectedSizeId = sizes.FirstOrDefault()?.Id ?? 1;
+        quantity = 1;
         await modal.ShowAsync();
     }
 
@@ -279,93 +268,264 @@
 }
 
 <style>
-    .page-title {
-        text-align: center;
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 20px;
+    /* Tổng thể */
+    :root {
+        --primary-color: #ff8c66; /* Màu cam nhẹ */
+        --secondary-color: #ffe4c4; /* Màu be nhạt (giống trà sữa) */
+        --text-color: #4a2c2a; /* Màu nâu đậm */
+        --accent-color: #ff6347; /* Màu cam đậm cho điểm nhấn */
+        --background-color: #fffaf0; /* Màu nền nhạt */
     }
 
+    body {
+        background-color: var(--background-color);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+    }
+
+    /* Tiêu đề trang */
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 30px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    /* Danh sách sản phẩm */
     .product-container {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        padding: 20px;
     }
 
     .product-card {
         background-color: #fff;
-        border-radius: 15px;
+        border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
         text-align: center;
         padding: 15px;
-        display: flex;
-        flex-direction: column;
-        transition: transform 0.3s, box-shadow 0.3s;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 2px solid var(--secondary-color);
     }
 
     .product-card:hover {
         transform: translateY(-10px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        border-color: var(--primary-color);
     }
 
     .product-image {
         width: 100%;
-        height: 200px;
+        height: 220px;
         object-fit: cover;
-        border-radius: 10px;
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.05);
     }
 
     .product-details {
         margin-top: 15px;
-        flex-grow: 1;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        gap: 10px;
     }
 
     .product-details h3 {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 8px;
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin: 0;
     }
 
     .product-details p {
         font-size: 1rem;
-        color: #777;
-        margin-bottom: 10px;
-        flex-grow: 1;
+        color: #666;
+        margin: 0;
+    }
+
+    .product-price {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--accent-color);
+        margin: 5px 0;
     }
 
     .product-buy-button {
-        padding: 10px;
-        font-size: 1.2rem;
-        color: white;
-        background-color: #007bff;
+        background-color: var(--primary-color);
         border: none;
         border-radius: 50%;
         width: 50px;
         height: 50px;
-        cursor: pointer;
-        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease, transform 0.3s ease;
         align-self: center;
     }
 
-    .product-image {
+    .product-buy-button:hover {
+        background-color: var(--accent-color);
+        transform: scale(1.1);
+    }
+
+    /* Modal */
+    .modal-content-wrapper {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .product-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .product-header h3 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 10px;
+    }
+
+    .product-header p {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .product-header .product-image {
         width: 100%;
+        max-width: 200px;
         height: auto;
-        max-width: 150px;
+        border-radius: 10px;
         margin: 0 auto;
         display: block;
     }
 
-    .product-buy-button:hover {
-        background-color: #0056b3;
+    .option-section {
+        margin-bottom: 20px;
     }
 
-    /* CSS cho chi tiết combo */
+    .option-section label {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--text-color);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    /* Quantity Selector */
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid var(--primary-color);
+        background-color: white;
+        color: var(--primary-color);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .quantity-value {
+        font-size: 1.2rem;
+        font-weight: 500;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    .form-control {
+        border: 2px solid var(--secondary-color);
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 5px rgba(255, 140, 102, 0.3);
+        outline: none;
+    }
+
+    /* Topping */
+    .topping-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .topping-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        background-color: var(--secondary-color);
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .topping-item:hover {
+        background-color: #ffdab9;
+    }
+
+    .topping-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid var(--primary-color);
+    }
+
+    .topping-details {
+        flex-grow: 1;
+    }
+
+    .topping-details label {
+        font-size: 1rem;
+        color: var(--text-color);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .topping-price {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--accent-color);
+    }
+
+    .topping-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+    }
+
+    /* Chi tiết combo */
     .combo-items {
         display: flex;
         flex-direction: column;
@@ -377,15 +537,22 @@
         display: flex;
         align-items: center;
         gap: 15px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 10px;
+        padding: 10px;
+        background-color: var(--secondary-color);
+        border-radius: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .combo-item:hover {
+        background-color: #ffdab9;
     }
 
     .combo-item-image {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         object-fit: cover;
-        border-radius: 5px;
+        border-radius: 8px;
+        border: 2px solid var(--primary-color);
     }
 
     .combo-item-details {
@@ -395,10 +562,97 @@
     .combo-item-details p {
         margin: 0;
         font-size: 1rem;
-        color: #333;
+        color: var(--text-color);
     }
 
     .combo-item-details p strong {
-        font-weight: bold;
+        font-weight: 600;
+    }
+
+    .combo-item-price {
+        color: var(--accent-color);
+        font-weight: 500;
+    }
+
+    /* Giá tổng */
+    .price-section {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .price-section label {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+
+    .total-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--accent-color);
+        margin: 5px 0 0 0;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .product-container {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .product-card {
+            padding: 10px;
+        }
+
+        .product-image {
+            height: 180px;
+        }
+
+        .product-details h3 {
+            font-size: 1.4rem;
+        }
+
+        .product-details p {
+            font-size: 0.9rem;
+        }
+
+        .product-price {
+            font-size: 1rem;
+        }
+
+        .modal-content-wrapper {
+            padding: 15px;
+        }
+
+        .product-header h3 {
+            font-size: 1.5rem;
+        }
+
+        .combo-item-image {
+            width: 50px;
+            height: 50px;
+        }
+
+        .combo-item-details p {
+            font-size: 0.9rem;
+        }
+
+        .topping-image {
+            width: 40px;
+            height: 40px;
+        }
+
+        .topping-details label {
+            font-size: 0.9rem;
+        }
+
+        .topping-price {
+            font-size: 0.8rem;
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+        }
     }
 </style>

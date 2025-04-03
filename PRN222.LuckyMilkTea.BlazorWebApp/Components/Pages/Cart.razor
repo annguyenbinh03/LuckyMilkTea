@@ -1,0 +1,183 @@
+﻿@page "/cart"
+@using PRN222.MilkTeaShop.Repository.Models
+@using PRN222.MilkTeaShop.Service.Services
+@using PRN222.MilkTeaShop.Service.Services.Interface
+@using BlazorBootstrap
+@using PRN222.LuckyMilkTea.BlazorWebApp.Service
+@inject ISizeService SizeService
+@inject IOrderDetailService OrderDetailService
+@inject IOrderService OrderService
+@inject CartService CartService
+@inject NavigationManager Navigation
+@inject IProductService ProductService
+
+@rendermode InteractiveServer
+
+<PageTitle>Giỏ Hàng</PageTitle>
+
+<h1 class="mb-4 text-center">🛒 Giỏ Hàng Của Bạn</h1>
+
+@if (CartService.CartItems.Count == 0)
+{
+    <div class="alert alert-warning text-center">
+        Giỏ hàng của bạn đang trống!
+    </div>
+}
+else
+{
+    <table class="table table-bordered text-center">
+        <thead class="table-dark">
+            <tr>
+                <th> </th>
+                <th>Sản phẩm</th>
+                <th>Size</th>
+                <th>Topping</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Tổng</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in CartService.CartItems)
+            {
+                <tr>
+                    <td><img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="img-thumbnail" style="max-height: 80px;" /></td>
+                    <td>@item.Product.Name</td>
+                    <td>@item.SizeName</td>
+                    <td>
+                        @if (item.Toppings.Any())
+                        {
+                            <ul class="list-unstyled">
+                                @foreach (var toppingId in item.Toppings)
+                                {
+                                    var topping = availableToppings.FirstOrDefault(t => t.Id.ToString() == toppingId);
+                                    if (topping != null)
+                                    {
+                                        <li>@topping.Name</li>
+                                    }
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span>Không có topping</span>
+                        }
+                    </td>
+                    <td>
+                        <Button class="btn btn-sm btn-outline-primary" @onclick="() => DecreaseQuantity(item)">-</Button>
+                        <span class="mx-2">@item.Quantity</span>
+                        <Button class="btn btn-sm btn-outline-primary" @onclick="() => IncreaseQuantity(item)">+</Button>
+                    </td>
+                    <td>@string.Format("{0:C}", item.TotalPrice)</td>
+                    <td>@string.Format("{0:C}", item.TotalPrice * item.Quantity)</td>
+                    <td>
+                        <Button class="btn btn-sm btn-danger" @onclick="() => RemoveItem(item)">Xóa</Button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end">
+        <h4 class="fw-bold">Tổng tiền: @string.Format("{0:C}", CartService.CartItems.Sum(i => i.TotalPrice * i.Quantity))</h4>
+        <button class="btn btn-success mt-3" @onclick="Checkout">🛍️ Đặt hàng</button>
+    </div>
+}
+
+@code {
+    private List<Product> availableToppings = new List<Product>();
+    private bool orderPlacedSuccessfully = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableToppings = await ProductService.GetToppingAsync();
+    }
+
+    private void IncreaseQuantity(CartItem item)
+    {
+        item.Quantity++;
+    }
+
+    private void DecreaseQuantity(CartItem item)
+    {
+        if (item.Quantity > 1)
+            item.Quantity--;
+    }
+
+    private void RemoveItem(CartItem item)
+    {
+        CartService.RemoveFromCart(item);
+    }
+
+    private async Task Checkout()
+    {
+        try
+        {
+            if (CartService.CartItems.Count == 0)
+            {
+                return;
+            }
+
+            // Tính tổng giá đúng với số lượng
+            decimal totalPrice = CartService.CartItems.Sum(i => i.TotalPrice * i.Quantity);
+
+            Order order = new Order
+                {
+                    CreatedAt = DateTime.Now,
+                    TotalPrice = totalPrice,
+                    UpdatedAt = DateTime.Now,
+                    Status = "pending"
+                };
+
+            await OrderService.CreateOrderAsync(order);
+
+            var createdOrder = (await OrderService.GetAllOrdersAsync())
+                .OrderByDescending(o => o.CreatedAt)
+                .FirstOrDefault();
+
+            if (createdOrder == null)
+            {
+                return;
+            }
+
+            foreach (var cartItem in CartService.CartItems)
+            {
+                // Sử dụng đúng quantity từ cartItem
+                OrderDetail orderDetail = new OrderDetail
+                    {
+                        OrderId = createdOrder.Id,
+                        ProductId = cartItem.Product.Id,
+                        Quantity = cartItem.Quantity, // Sử dụng quantity từ giỏ hàng
+                        Price = cartItem.TotalPrice, // Giá đơn vị
+                        SizeId = cartItem.SizeId
+                    };
+
+                await OrderDetailService.CreateOrderDetailAsync(orderDetail);
+
+                if (cartItem.Toppings.Any())
+                {
+                    foreach (var toppingId in cartItem.Toppings)
+                    {
+                        if (int.TryParse(toppingId, out int toppingIdInt))
+                        {
+                            // Thêm topping với số lượng bằng với sản phẩm chính
+                            for (int i = 0; i < cartItem.Quantity; i++)
+                            {
+                                await OrderDetailService.AddToppingToOrderDetailAsync(orderDetail.Id, toppingIdInt);
+                            }
+                        }
+                    }
+                }
+            }
+
+            orderPlacedSuccessfully = true;
+            CartService.ClearCart();
+            Navigation.NavigateTo("/cart");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during checkout: {ex.Message}");
+        }
+    }
+}

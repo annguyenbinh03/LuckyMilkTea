@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PRN222.LuckyMilkTea.BlazorWebApp.Components;
+using PRN222.LuckyMilkTea.BlazorWebApp.Service;
 using PRN222.MilkTeaShop.Repository.DbContexts;
+using PRN222.MilkTeaShop.Repository.Repositories;
 using PRN222.MilkTeaShop.Repository.UnitOfWork;
 using PRN222.MilkTeaShop.Service.Services;
 using PRN222.MilkTeaShop.Service.Services.Interface;
@@ -17,8 +19,10 @@ builder.Services.AddDbContext<MilkTeaDBContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISizeService, SizeService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+builder.Services.AddScoped<CartService>();
 builder.Services.AddBlazorBootstrap();
 // Add services to the container.
 builder.Services.AddRazorComponents()
