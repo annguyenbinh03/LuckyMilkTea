@@ -189,5 +189,43 @@ namespace PRN222.MilkTeaShop.Service.Services
 
 			await _unitOfWork.SaveChanges();
 		}
+
+        public async Task<(IEnumerable<Product>, int)> GetToppings(string? search, int? page = null, int? pageSize = null)
+        {
+            var (products, totalItems) = await _unitOfWork.Product.GetToppings(search, page, pageSize);
+            return (products.ToList(), totalItems);
+        }
+
+        public async Task<Product?> GetTopping(int id)
+        {
+            var product = await _unitOfWork.Product.GetTopping(id);
+            if (product == null)
+                return null;
+
+            return product;
+        }
+
+		public async Task CreateTopping(ToppingModel model)
+		{
+			Product? product = model.ToProduct();
+			product.CategoryId = 2;
+			product.Status = ProductStatus.active.ToString();
+			product.CreatedAt = TimeZoneUtil.GetCurrentTime();
+			product.UpdatedAt = TimeZoneUtil.GetCurrentTime();
+
+			if (product == null)
+			{
+				throw new Exception("Can not parse product");
+			}
+			try
+			{
+				await _unitOfWork.Product.AddAsync(product);
+				await _unitOfWork.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+		}
 	}
 }

@@ -57,5 +57,42 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
 
 			return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == id);
 		}
-    }
+
+		public async Task<(IEnumerable<Product>, int)> GetToppings(string? search, int? page = null, int? pageSize = null)
+		{
+			IQueryable<Product> query = _dbSet.Where(p => p.CategoryId == 2);
+
+			if (!string.IsNullOrEmpty(search))
+			{
+				query = query.Where(e => e.Name.ToLower().Contains(search));
+			}
+
+			int totalItems = await query.CountAsync();
+
+			query = query
+			.OrderBy(p => p.Status == "active" ? 1 : 0)
+			.ThenBy(p => p.UpdatedAt).Reverse();
+
+			if (page.HasValue && pageSize.HasValue)
+			{
+				query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
+			}
+
+			return (await query.ToListAsync(), totalItems);
+		}
+
+		public async Task<Product?> GetTopping(int id)
+		{
+			IQueryable<Product> query = _dbSet;
+
+			var keyName = _context.Model
+								 .FindEntityType(typeof(Product))?
+								 .FindPrimaryKey()?
+								 .Properties
+								 .Select(x => x.Name)
+								 .FirstOrDefault();
+
+			return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == id);
+		}
+	}
 }

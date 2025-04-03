@@ -1,0 +1,73 @@
+﻿@model PRN222.MilkTeaShop.Manager.Models.Request.ToppingCreationRequest
+
+@{
+	ViewData["Title"] = "Create";
+	Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="row">
+	<form asp-action="Create" enctype="multipart/form-data">
+		<div class="row d-flex justify-content-between">
+			<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label asp-for="Name" class="control-label"></label>
+					<input asp-for="Name" class="form-control" />
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Description" class="control-label"></label>
+					<input asp-for="Description" class="form-control" />
+					<span asp-validation-for="Description" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="Price" class="control-label"></label>
+					<input asp-for="Price" class="form-control" />
+					<span asp-validation-for="Price" class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label asp-for="Image" class="control-label">Ảnh sản phẩm</label>
+					<input asp-for="Image" type="file" class="form-control" id="imageUpload" name="Image" accept="image/*" />
+					<span asp-validation-for="Image" class="text-danger"></span>
+				</div>
+				<div>
+					<img id="previewImage" src="#" alt="Preview" style="display:none; max-width:300px; max-height:300px;" />
+				</div>
+			</div>
+
+			<div class="form-group d-flex mt-3">
+				<div>
+					<span class="text-danger"> @ViewBag.Error </span>
+				</div>
+				<input type="submit" value="Tạo sản phẩm" class="btn btn-primary" />
+
+				<a class="btn btn-secondary ms-3" asp-action="Index">Trở về danh sách</a>
+			</div>
+	</form>
+</div>
+
+@section Scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script>
+		document.getElementById('imageUpload').addEventListener('change', function (event) {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+
+				reader.onload = function (e) {
+					document.getElementById('previewImage').src = e.target.result;
+					document.getElementById('previewImage').style.display = 'block';
+				}
+
+				reader.readAsDataURL(file);
+			} else {
+				document.getElementById('previewImage').src = '#';
+				document.getElementById('previewImage').style.display = 'none';
+			}
+		});
+	</script>
+}
