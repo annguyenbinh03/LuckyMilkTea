@@ -90,6 +90,12 @@
 
                     <div class="option-section">
                         <label>Chọn Topping:</label>
+                        @if (!string.IsNullOrEmpty(toppingMessage))
+                        {
+                            <div class="alert alert-warning" role="alert">
+                                @toppingMessage
+                            </div>
+                        }
                         <div class="topping-list">
                             @foreach (var topping in availableToppings)
                             {
@@ -105,7 +111,8 @@
                                            id="topping-@topping.Id"
                                            value="@topping.Id"
                                            @onchange="(e) => OnToppingChanged(e, topping)"
-                                           checked="@(selectedToppings.Contains(topping.Id.ToString()))" />
+                                           checked="@(selectedToppings.Contains(topping.Id.ToString()))"
+                                           disabled="@(selectedToppings.Count >= 3 && !selectedToppings.Contains(topping.Id.ToString()))" />
                                 </div>
                             }
                         </div>
@@ -162,6 +169,7 @@
     </FooterTemplate>
 </Modal>
 
+
 @code {
     private string successMessage = string.Empty;
     private List<Product> products = new List<Product>();
@@ -172,6 +180,7 @@
     private int selectedSizeId = 1;
     private List<string> selectedToppings = new List<string>();
     private int quantity = 1;
+    private string toppingMessage = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -197,17 +206,30 @@
     {
         if (e.Value is bool isChecked)
         {
-            if (isChecked && !selectedToppings.Contains(topping.Id.ToString()))
+            // Nếu topping được chọn và số lượng topping đã chọn ít hơn 3
+            if (isChecked && selectedToppings.Count < 3 && !selectedToppings.Contains(topping.Id.ToString()))
             {
                 selectedToppings.Add(topping.Id.ToString());
+                toppingMessage = string.Empty;  // Xóa thông báo nếu còn chỗ chọn topping
             }
+            // Nếu topping bị bỏ chọn
             else if (!isChecked && selectedToppings.Contains(topping.Id.ToString()))
             {
                 selectedToppings.Remove(topping.Id.ToString());
+                toppingMessage = string.Empty;  // Xóa thông báo nếu topping bị bỏ
             }
+            // Nếu topping được chọn nhưng đã có 3 topping, hiển thị thông báo
+            else if (isChecked && selectedToppings.Count >= 3)
+            {
+                toppingMessage = "Bạn chỉ có thể chọn tối đa 3 topping!";
+                StateHasChanged();
+                return;
+            }
+
             StateHasChanged();
         }
     }
+
 
     private decimal CalculateTotalPrice()
     {
