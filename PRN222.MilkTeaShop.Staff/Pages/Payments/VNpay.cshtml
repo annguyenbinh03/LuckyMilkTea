@@ -1,0 +1,18 @@
+﻿@page "/payments/vnpay/{amount}/{orderId}"
+@model PRN222.MilkTeaShop.Staff.Pages.Payments.VNpayModel
+
+@{
+    ViewData["Title"] = "VNPay Payment";
+}
+
+<h2>Processing Payment...</h2>
+<p>Order ID: @Model.OrderId</p>
+<p>Amount: @Model.Amount VND</p>
+
+<p>Redirecting to VNPay...</p>
+
+<script>
+    setTimeout(function() {
+        window.location.href = "@Model.PaymentUrl";
+    }, 2000);
+</script>

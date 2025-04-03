@@ -49,11 +49,26 @@ namespace PRN222.MilkTeaShop.Staff.Pages.Payments
                 ModelState.AddModelError(string.Empty, "Payment object is null.");
                 return Page();
             }
-            Console.WriteLine(OrderId);
 
-            await _paymentService.CreatePaymentAsync(Payment);
-            return RedirectToPage("/Orders/Index");
+            if (Payment.PaymentMethodId == 1) // VNPay
+            {
+                // Điều hướng tới trang xử lý VNPay
+                return RedirectToPage("/Payments/VNPay", new { amount = Payment.Amount, orderId = Payment.OrderId });
+            }
+            else if (Payment.PaymentMethodId == 2) // Cash
+            {
+                // Nếu là Cash, tạo payment và lưu vào cơ sở dữ liệu
+                await _paymentService.CreatePaymentAsync(Payment);
+
+                // Sau khi lưu thanh toán, quay lại trang danh sách đơn hàng
+                return RedirectToPage("/Payments/Index");
+            }
+
+            // Nếu không chọn phương thức hợp lệ
+            ModelState.AddModelError(string.Empty, "Invalid payment method.");
+            return Page();
         }
+
 
 
     }

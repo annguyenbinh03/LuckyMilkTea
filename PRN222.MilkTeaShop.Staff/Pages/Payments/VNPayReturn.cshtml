@@ -1,0 +1,22 @@
+﻿@page
+
+@model PRN222.MilkTeaShop.Staff.Pages.Payments.VNPayReturnModel
+
+@{
+    ViewData["Title"] = "Kết quả thanh toán";
+}
+
+<h2>@Model.Message</h2>
+
+<!-- Hiển thị trạng thái thanh toán (thành công hoặc thất bại) -->
+@if (Model.IsValid)
+{
+    <p>Thanh toán thành công!</p>
+}
+else
+{
+    <p>Thanh toán không thành công. Vui lòng thử lại!</p>
+}
+
+<!-- Liên kết quay lại trang chủ -->
+<a href="/">Quay về trang chủ</a>

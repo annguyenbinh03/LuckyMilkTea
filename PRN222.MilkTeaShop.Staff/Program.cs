@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PRN222.MilkTeaShop.Repository.DbContexts;
 using PRN222.MilkTeaShop.Repository.Repositories;
+using PRN222.MilkTeaShop.Repository.UnitOfWork;
 using PRN222.MilkTeaShop.Service.Services;
 using PRN222.MilkTeaShop.Service.Services.Interface;
 
@@ -16,6 +17,9 @@ builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IOrderDetailService, OrderDetailService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
 
 
 builder.Services.AddDbContext<MilkTeaDBContext>(options =>

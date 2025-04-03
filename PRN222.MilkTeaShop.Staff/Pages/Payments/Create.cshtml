@@ -1,13 +1,14 @@
 ﻿@page
+
 @model PRN222.MilkTeaShop.Staff.Pages.Payments.CreateModel
+
 @{
     Layout = "_Layout";  // Sử dụng layout đã tạo ở trên
 }
 
-
 <h2>Create New Payment for Order @Model.OrderId</h2>
 
-<form method="post">
+<form id="paymentForm" method="post">
     <div class="form-group">
         <label for="Amount">Amount</label>
         <input type="text" class="form-control" id="Amount" name="Payment.Amount" value="@Model.Amount" readonly />
@@ -15,8 +16,8 @@
 
     <div class="form-group">
         <label for="PaymentMethodId">Payment Method</label>
-        <select class="form-control" id="PaymentMethodId" name="Payment.PaymentMethodId" >
-            <option value="1">Credit Card</option>
+        <select class="form-control" id="PaymentMethodId" name="Payment.PaymentMethodId">
+            <option value="1">Credit Card (VNPay)</option>
             <option value="2">Cash</option>
         </select>
     </div>
@@ -30,9 +31,16 @@
 <script>
     document.getElementById("paymentForm").addEventListener("submit", function (event) {
         var paymentMethod = document.getElementById("PaymentMethodId").value;
-        if (paymentMethod === "1") {  // Credit Card được chọn
+        var amount = document.getElementById("Amount").value; // Lấy giá trị Amount
+        var orderId = "@Model.OrderId"; // Lấy OrderId từ Razor Model
+
+        if (paymentMethod === "1") {  // Chọn VNPay
             event.preventDefault();  // Ngăn chặn form gửi đi
-            window.location.href = "/payments";  // Điều hướng đến trang /payments
+
+            // Điều hướng đến trang xử lý VNPay
+            window.location.href = `/payments/vnpay/${amount}/${orderId}`;
         }
+        // Nếu chọn Cash, form sẽ gửi đi bình thường
     });
 </script>
+
