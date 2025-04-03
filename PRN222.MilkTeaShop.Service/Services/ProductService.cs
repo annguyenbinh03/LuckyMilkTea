@@ -233,7 +233,11 @@ namespace PRN222.MilkTeaShop.Service.Services
 
             return products;
         }
-	}
+        public async Task<List<Product>> GetCombosAsync()
+        {
+            return await _unitOfWork.Product.GetCombosAsync();
+        }
+    }
 
 
 

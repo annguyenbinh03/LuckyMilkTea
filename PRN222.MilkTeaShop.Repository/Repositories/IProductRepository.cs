@@ -15,5 +15,8 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
 		Task<Product?> GetTopping(int id);
 
         Task<List<Product>> GetStartMilkTeas();
+
+        Task<List<Product>> GetCombosAsync();
+        Task<Product?> GetComboAsync(int id);
     }
 }

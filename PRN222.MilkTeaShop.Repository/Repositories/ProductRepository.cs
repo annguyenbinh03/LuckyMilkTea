@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PRN222.MilkTeaShop.Repository.DbContexts;
 using PRN222.MilkTeaShop.Repository.Models;
 using PRN222.MilkTeaShop.Repository.Repositories;
 using System;
@@ -103,6 +104,24 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
                 .Include(p => p.ProductSizes)
                 .ThenInclude(ps => ps.Size)
                 .ToListAsync();
+        }
+
+        public async Task<Product?> GetComboAsync(int id)
+        {
+            return await _dbSet
+                .Where(p => p.Id == id && p.CategoryId == 2)
+                .Include(p => p.ProductCombos)
+                .ThenInclude(pc => pc.Product)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Product?> GetComboAsync(int id)
+        {
+            return await _dbSet
+                .Where(p => p.Id == id && p.CategoryId == 2)
+                .Include(p => p.ProductCombos)
+                .ThenInclude(pc => pc.Product)
+                .FirstOrDefaultAsync();
         }
     }
 }
