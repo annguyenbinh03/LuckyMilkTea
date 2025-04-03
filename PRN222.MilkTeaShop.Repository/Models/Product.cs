@@ -19,6 +19,8 @@ public partial class Product
 
     public string ImageUrl { get; set; }
 
+    public int? SoldCount { get; set; }
+
     public string Status { get; set; }
 
     public DateTime? CreatedAt { get; set; }
