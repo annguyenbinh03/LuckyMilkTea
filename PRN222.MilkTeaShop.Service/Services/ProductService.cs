@@ -391,6 +391,17 @@ namespace PRN222.MilkTeaShop.Service.Services
 				throw new Exception(ex.Message);
 			}
 		}
-	}
+        public async Task UpdateProductSoldCount(int productId, int soldCount)
+        {
+            var product = await _unitOfWork.Product.GetByIdAsync(productId);
+            if (product != null)
+            {
+                product.SoldCount = soldCount;
+                product.UpdatedAt = TimeZoneUtil.GetCurrentTime(); // Update the timestamp for consistency
+                _unitOfWork.Product.Update(product);
+                await _unitOfWork.SaveChanges();
+            }
+        }
+    }
  
 }
