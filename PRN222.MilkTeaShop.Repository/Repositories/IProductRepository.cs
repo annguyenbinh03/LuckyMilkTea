@@ -12,11 +12,11 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
         Task<(IEnumerable<Product>, int)> GetMilkTeas(string? search, int? page = null, int? pageSize = null);
         Task<Product?> GetMilkTea(int id);
         Task<(IEnumerable<Product>, int)> GetToppings(string? search, int? page = null, int? pageSize = null);
-		Task<Product?> GetTopping(int id);
-
+        Task<Product?> GetTopping(int id);
         Task<List<Product>> GetStartMilkTeas();
-
         Task<List<Product>> GetCombosAsync();
         Task<Product?> GetComboAsync(int id);
+        Task<List<Product>> GetToppingAsync();
+
     }
 }

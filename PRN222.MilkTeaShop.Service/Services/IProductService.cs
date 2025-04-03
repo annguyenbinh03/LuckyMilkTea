@@ -25,6 +25,8 @@ namespace PRN222.MilkTeaShop.Service.Services
         Task<List<Product>> GetStartMilkTeas();
 
         Task<List<Product>> GetCombosAsync();
+
+        Task<List<Product>> GetToppingAsync();
     }
 }
 

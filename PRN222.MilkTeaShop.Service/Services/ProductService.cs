@@ -238,6 +238,11 @@ namespace PRN222.MilkTeaShop.Service.Services
             return await _unitOfWork.Product.GetCombosAsync();
         }
 
+        public async Task<List<Product>> GetToppingAsync()
+        {
+            return await _unitOfWork.Product.GetToppingAsync();
+        }
+
         public async Task UpdateTopping(ToppingModel model)
         {
             Product? product = await _unitOfWork.Product.GetByIdAsync(model.Id);

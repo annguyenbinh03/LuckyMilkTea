@@ -83,25 +83,33 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
 			return (await query.ToListAsync(), totalItems);
 		}
 
-		public async Task<Product?> GetTopping(int id)
-		{
-			IQueryable<Product> query = _dbSet;
-
-			var keyName = _context.Model
-								 .FindEntityType(typeof(Product))?
-								 .FindPrimaryKey()?
-								 .Properties
-								 .Select(x => x.Name)
-								 .FirstOrDefault();
-
-			return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == id);
-		}
+        public async Task<Product?> GetTopping(int id)
+        {
+            IQueryable<Product> query = _dbSet;
+            query = query.Where(p => p.CategoryId == 3)
+                         .Include(p => p.ProductSizes)
+                         .ThenInclude(ps => ps.Size);
+            var keyName = _context.Model
+                                   .FindEntityType(typeof(Product))?
+                                   .FindPrimaryKey()?
+                                   .Properties
+                                   .Select(x => x.Name)
+                                   .FirstOrDefault();
+            return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, keyName) == id);
+        }
 
         public async Task<List<Product>> GetStartMilkTeas()
         {
             return await _dbSet
-                .Where(p => p.CategoryId == 1 || p.CategoryId == 2)
+                .Where(p => (p.CategoryId == 1 || p.CategoryId == 2) && p.Status == "active")
                 .Include(p => p.ProductSizes)
+                .ThenInclude(ps => ps.Size)
+                .Include(p => p.ProductComboCombos)
+                .ThenInclude(pc => pc.Product)
+                .ThenInclude(p => p.ProductSizes)
+                .ThenInclude(ps => ps.Size)
+                .Include(p => p.ProductComboCombos)
+                .ThenInclude(pc => pc.ProductSize)
                 .ThenInclude(ps => ps.Size)
                 .ToListAsync();
         }
@@ -110,18 +118,29 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
         {
             return await _dbSet
                 .Where(p => p.Id == id && p.CategoryId == 2)
-                .Include(p => p.ProductCombos)
+                .Include(p => p.ProductComboCombos)
                 .ThenInclude(pc => pc.Product)
                 .FirstOrDefaultAsync();
         }
-
-        public async Task<Product?> GetComboAsync(int id)
+        public async Task<List<Product>> GetCombosAsync()
         {
             return await _dbSet
-                .Where(p => p.Id == id && p.CategoryId == 2)
-                .Include(p => p.ProductCombos)
+                .Where(p => p.CategoryId == 2 && p.Status == "active")
+                .Include(p => p.ProductComboCombos)
                 .ThenInclude(pc => pc.Product)
-                .FirstOrDefaultAsync();
+                .ThenInclude(p => p.ProductSizes)
+                .Include(p => p.ProductComboCombos)
+                .ThenInclude(pc => pc.ProductSize)
+                .ToListAsync();
         }
+
+        public async Task<List<Product>> GetToppingAsync()
+        {
+            return await _dbSet
+                .Where(p => p.CategoryId == 3 && p.Status == "active")
+                .OrderBy(p => p.Name)
+                .ToListAsync();
+        }
+
     }
 }
