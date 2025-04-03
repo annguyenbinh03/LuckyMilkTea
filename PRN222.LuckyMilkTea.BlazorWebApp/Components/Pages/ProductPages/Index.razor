@@ -81,23 +81,29 @@
                 else if (selectedProduct.CategoryId == 2) // Combo
                 {
                     <label>Chi tiết Combo:</label>
-                    <div>
+                    <div class="combo-items">
                         @foreach (var comboItem in selectedProduct.ProductComboCombos) // Sử dụng ProductComboCombos
                         {
-                            <div>
-                                <p>
-                                    @comboItem.Product.Name
-                                    @if (comboItem.ProductSize != null)
-                                    {
-                                        <span>(@comboItem.ProductSize.Size.Name)</span>
-                                    }
-                                    - Số lượng: @comboItem.Quantity
-                                </p>
+                            <div class="combo-item">
+                                <img src="@comboItem.Product.ImageUrl" alt="@comboItem.Product.Name" class="combo-item-image" />
+                                <div class="combo-item-details">
+                                    <p>
+                                        <strong>@comboItem.Product.Name</strong>
+                                        @if (comboItem.ProductSize != null)
+                                        {
+                                            <span>(@comboItem.ProductSize.Size.Name)</span>
+                                        }
+                                        - Số lượng: @comboItem.Quantity
+                                    </p>
+                                    <p>
+                                        Giá: @string.Format("{0:C}", (comboItem.ProductSize?.Price ?? comboItem.Product.Price ?? 0) * comboItem.Quantity)
+                                    </p>
+                                </div>
                             </div>
                         }
                     </div>
 
-                    <label>Giá:</label>
+                    <label>Giá Tổng:</label>
                     <div>
                         <p style="font-size: 20px; font-weight: bold; color: red;">
                             @string.Format("{0:C}", selectedProduct.Price)
@@ -181,12 +187,12 @@
         {
             // Tạo Order
             Order order = new Order
-                {
-                    CreatedAt = DateTime.Now,
-                    TotalPrice = totalPrice,
-                    UpdatedAt = DateTime.Now,
-                    Status = "pending"
-                };
+            {
+                CreatedAt = DateTime.Now,
+                TotalPrice = totalPrice,
+                UpdatedAt = DateTime.Now,
+                Status = "pending"
+            };
             var createdOrder = await OrderService.CreateOrderAsync(order);
             if (createdOrder == null)
             {
@@ -201,13 +207,13 @@
                 : product.Price ?? 0;
 
             OrderDetail orderDetail = new OrderDetail
-                {
-                    OrderId = createdOrder.Id,
-                    ProductId = product.Id,
-                    Quantity = 1,
-                    Price = productPrice,
-                    SizeId = product.CategoryId == 1 ? sizeId : null
-                };
+            {
+                OrderId = createdOrder.Id,
+                ProductId = product.Id,
+                Quantity = 1,
+                Price = productPrice,
+                SizeId = product.CategoryId == 1 ? sizeId : null
+            };
             await OrderDetailService.CreateOrderDetailAsync(orderDetail);
 
             // Tạo OrderDetail cho topping (chỉ áp dụng cho trà sữa)
@@ -219,13 +225,13 @@
                     if (topping != null)
                     {
                         OrderDetail toppingDetail = new OrderDetail
-                            {
-                                OrderId = createdOrder.Id,
-                                ProductId = topping.Id,
-                                Quantity = 1,
-                                Price = topping.Price ?? 0,
-                                ParentId = orderDetail.Id
-                            };
+                        {
+                            OrderId = createdOrder.Id,
+                            ProductId = topping.Id,
+                            Quantity = 1,
+                            Price = topping.Price ?? 0,
+                            ParentId = orderDetail.Id
+                        };
                         await OrderDetailService.CreateOrderDetailAsync(toppingDetail);
                     }
                 }
@@ -233,17 +239,17 @@
             // Tạo OrderDetail cho các sản phẩm trong combo (nếu là combo)
             else if (product.CategoryId == 2)
             {
-                foreach (var comboItem in product.ProductComboCombos) // Sử dụng ProductComboCombos
+                foreach (var comboItem in product.ProductComboCombos)
                 {
                     OrderDetail comboItemDetail = new OrderDetail
-                        {
-                            OrderId = createdOrder.Id,
-                            ProductId = comboItem.ProductId,
-                            Quantity = comboItem.Quantity,
-                            Price = comboItem.Product.ProductSizes.FirstOrDefault(ps => ps.SizeId == comboItem.ProductSize?.SizeId)?.Price ?? 0,
-                            SizeId = comboItem.ProductSize?.SizeId,
-                            ParentId = orderDetail.Id
-                        };
+                    {
+                        OrderId = createdOrder.Id,
+                        ProductId = comboItem.ProductId,
+                        Quantity = comboItem.Quantity,
+                        Price = comboItem.Product.ProductSizes.FirstOrDefault(ps => ps.SizeId == comboItem.ProductSize?.SizeId)?.Price ?? comboItem.Product.Price ?? 0,
+                        SizeId = comboItem.ProductSize?.SizeId,
+                        ParentId = orderDetail.Id
+                    };
                     await OrderDetailService.CreateOrderDetailAsync(comboItemDetail);
                 }
             }
@@ -299,10 +305,10 @@
         transition: transform 0.3s, box-shadow 0.3s;
     }
 
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
 
     .product-image {
         width: 100%;
@@ -319,19 +325,19 @@
         justify-content: space-between;
     }
 
-        .product-details h3 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
+    .product-details h3 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+    }
 
-        .product-details p {
-            font-size: 1rem;
-            color: #777;
-            margin-bottom: 10px;
-            flex-grow: 1;
-        }
+    .product-details p {
+        font-size: 1rem;
+        color: #777;
+        margin-bottom: 10px;
+        flex-grow: 1;
+    }
 
     .product-buy-button {
         padding: 10px;
@@ -357,5 +363,42 @@
 
     .product-buy-button:hover {
         background-color: #0056b3;
+    }
+
+    /* CSS cho chi tiết combo */
+    .combo-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .combo-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .combo-item-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .combo-item-details {
+        flex-grow: 1;
+    }
+
+    .combo-item-details p {
+        margin: 0;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .combo-item-details p strong {
+        font-weight: bold;
     }
 </style>
