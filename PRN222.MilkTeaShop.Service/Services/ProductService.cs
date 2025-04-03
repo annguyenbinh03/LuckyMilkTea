@@ -282,7 +282,6 @@ namespace PRN222.MilkTeaShop.Service.Services
                 throw new Exception(ex.Message);
             }
         }
-<<<<<<< HEAD
         public async Task UpdateProductSoldCount(int productId, int soldCount)
         {
             var product = await _unitOfWork.Product.GetByIdAsync(productId);
@@ -294,8 +293,7 @@ namespace PRN222.MilkTeaShop.Service.Services
                 await _unitOfWork.SaveChanges();
             }
         }
-    }
-=======
+
 
         public async Task<(IEnumerable<ComboModel>, int)> GetCombos(string? search, int? page = null, int? pageSize = null)
         {
@@ -406,9 +404,5 @@ namespace PRN222.MilkTeaShop.Service.Services
 			}
 		}
 	}
->>>>>>> 921ced7630bc7e30b031a4b41ae63186a5a81bae
-
-
-
  
 }
