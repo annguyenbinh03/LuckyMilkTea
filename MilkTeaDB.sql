@@ -31,6 +31,7 @@ CREATE TABLE Product (
     Price DECIMAL(10,2) NULL,
     CategoryId INT NOT NULL,
     ImageUrl NVARCHAR(500),
+    SoldCount INT DEFAULT 0,
     Status VARCHAR(10) CHECK (Status IN ('active', 'inactive', 'deleted')) DEFAULT 'active',
     CreatedAt DATETIME DEFAULT GETDATE(),
     UpdatedAt DATETIME DEFAULT GETDATE(),
@@ -62,7 +63,8 @@ CREATE TABLE ProductSize (
 -- Bảng nhân viên
 CREATE TABLE Employee (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    Name NVARCHAR(255) NOT NULL,
+    Username NVARCHAR(50) NOT NULL,
+    Password NVARCHAR(50) NOT NULL,
     Role VARCHAR(10) CHECK (Role IN ('admin', 'staff', 'cashier')),
     Phone NVARCHAR(15) UNIQUE NOT NULL,
     Email NVARCHAR(255) UNIQUE,
@@ -90,9 +92,11 @@ CREATE TABLE OrderDetail (
     Quantity INT NOT NULL DEFAULT 1,
     Price DECIMAL(10,2) NOT NULL,
 	SizeId INT NULL,
+	ParentId INT NULL,
     FOREIGN KEY (OrderId) REFERENCES [Order](Id) ON DELETE NO ACTION,
     FOREIGN KEY (ProductId) REFERENCES Product(Id) ON DELETE NO ACTION,
-	FOREIGN KEY (SizeId) REFERENCES Size(Id) ON DELETE NO ACTION
+	FOREIGN KEY (SizeId) REFERENCES Size(Id) ON DELETE NO ACTION,
+	FOREIGN KEY (ParentId) REFERENCES [OrderDetail](Id) ON DELETE NO ACTION,
 );
 GO
 
@@ -170,7 +174,7 @@ INSERT INTO ProductCombo (ComboId, ProductId, Quantity) VALUES
 GO
 
 -- Thêm dữ liệu mẫu vào bảng Employee
-INSERT INTO Employee (Name, Role, Phone, Email, Status)
+INSERT INTO Employee (Username, Password, Role, Phone, Email, Status)
 VALUES 
-(N'Admin 1', 'admin', '0901234567', 'admin1@example.com', 'active');
+('admin', '12345678','admin','0901234567', 'admin1@example.com', 'active');
 GO
