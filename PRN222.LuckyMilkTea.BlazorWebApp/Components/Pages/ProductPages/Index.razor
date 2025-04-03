@@ -41,6 +41,7 @@
                         <span>@string.Format("{0:C}", product.Price)</span>
                     }
                 </p>
+                <p class="sold-count">Đã bán: @(product.SoldCount ?? 0)</p> <!-- Add SoldCount here -->
                 <Button @onclick="() => OnShowModalClick(product)" class="btn btn-primary product-buy-button">
                     <i class="bi bi-cart-plus"></i>
                 </Button>
@@ -243,7 +244,16 @@
         // Tính totalPrice đúng với số lượng
         decimal itemTotalPrice = CalculateTotalPrice(); // Đã bao gồm quantity
 
-        CartService.AddToCart(product, sizeId, sizeName, toppings, itemTotalPrice, quantity); // Thêm quantity vào
+        // Thêm sản phẩm vào giỏ hàng
+        CartService.AddToCart(product, sizeId, sizeName, toppings, itemTotalPrice, quantity);
+
+        // Tăng SoldCount của sản phẩm theo số lượng mua
+        product.SoldCount = (product.SoldCount ?? 0) + quantity;
+
+        // Cập nhật SoldCount trong cơ sở dữ liệu
+        await ProductService.UpdateProductSoldCount(product.Id, product.SoldCount ?? 0);
+
+        // Hiển thị thông báo thành công
         successMessage = "Sản phẩm đã được thêm vào giỏ hàng!";
         StateHasChanged();
         await Task.Delay(1000);
@@ -653,6 +663,12 @@
 
         .total-price {
             font-size: 1.5rem;
+        }
+        .sold-count {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-color);
+            margin: 5px 0;
         }
     }
 </style>
