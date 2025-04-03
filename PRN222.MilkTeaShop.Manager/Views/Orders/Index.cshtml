@@ -1,0 +1,62 @@
+﻿@model IEnumerable<PRN222.MilkTeaShop.Repository.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+    ViewData["HeaderTitle"] = "Orders";
+    Layout = "~/Views/Shared/_ManagerLayout.cshtml";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedAt)
+            </th>
+            <th>
+                Order Details
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedAt)
+            </td>
+                <td>
+                        @foreach (var orderDetail in item.OrderDetails)
+                        {
+                        <div class="border p-1 m-1">
+                                <img src="@orderDetail.Product.ImageUrl" width="50px" />
+                                Product: @orderDetail.Product.Name
+                                 (@orderDetail.Quantity)
+                                @if (orderDetail.Size != null)
+                                {
+                                   @: ( Size: @orderDetail.Size.Name )
+                                }
+                              @(((int)orderDetail.Price).ToString("N0")) VND
+                            </div>
+                        }
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

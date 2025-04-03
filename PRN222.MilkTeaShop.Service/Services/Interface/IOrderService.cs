@@ -14,5 +14,6 @@ namespace PRN222.MilkTeaShop.Service.Services.Interface
         Task CreateOrderAsync(Order order);
         Task UpdateOrderAsync(Order order);
         Task DeleteOrderAsync(int orderId);
+        Task<IEnumerable<Order>> GetOrders();
     }
 }

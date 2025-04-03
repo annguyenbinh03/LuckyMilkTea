@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PRN222.MilkTeaShop.Repository.Models;
 using PRN222.MilkTeaShop.Repository.Repositories;
+using PRN222.MilkTeaShop.Repository.UnitOfWork;
 using PRN222.MilkTeaShop.Service.Services.Interface;
 
 namespace PRN222.MilkTeaShop.Service.Services
@@ -12,10 +13,12 @@ namespace PRN222.MilkTeaShop.Service.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public OrderService(IOrderRepository orderRepository)
+        public OrderService(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
         {
             _orderRepository = orderRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Order> GetOrderByIdAsync(int orderId)
@@ -41,6 +44,24 @@ namespace PRN222.MilkTeaShop.Service.Services
         public async Task DeleteOrderAsync(int orderId)
         {
             await _orderRepository.DeleteOrderAsync(orderId);
+        }
+
+        public async Task<IEnumerable<Order>> GetOrders()
+        {
+            var (orders, totalItems) = await _unitOfWork.Order.GetAsync(includes: o => o.OrderDetails, orderBy: o => o.OrderBy(order => order.CreatedAt), descending: true);
+
+            foreach (var order in orders)
+            {
+                List<OrderDetail> details = new List<OrderDetail>();
+                foreach (var orderDetail in order.OrderDetails)
+                {
+                    var detail = await _unitOfWork.OrderDetail.GetByIdAsync(orderDetail.Id, od => od.Product,   od => od.Size);
+                    if (detail != null)
+                        details.Add(detail);
+                }
+                order.OrderDetails = details;
+            }
+            return orders;
         }
     }
 }
