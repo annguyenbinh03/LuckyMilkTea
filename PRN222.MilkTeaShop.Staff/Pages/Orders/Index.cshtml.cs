@@ -35,14 +35,17 @@ namespace PRN222.MilkTeaShop.Staff.Pages.Orders
                 Orders = await _orderService.GetAllOrdersAsync();
                 return Page();
             }
-           
+
             // Cập nhật trạng thái đơn hàng
-            if (newStatus == "Cancelled" && payment.Status == "Completed")
+            if (newStatus == "Cancelled" && (payment == null || payment.Status == "Completed"))
             {
                 ErrorMessage = "Trạng thái 'Cancelled' chỉ có thể chọn khi thanh toán thất bại hoặc đang chờ.";
+
                 Orders = await _orderService.GetAllOrdersAsync();
+
                 return Page();
             }
+
 
             order.Status = newStatus;
             await _orderService.UpdateOrderAsync(order);
