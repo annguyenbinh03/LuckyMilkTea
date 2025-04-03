@@ -33,14 +33,24 @@ namespace PRN222.MilkTeaShop.Service.Services
             await _paymentRepository.AddPaymentAsync(payment);
         }
 
-        public async Task UpdatePaymentAsync(Payment payment)
+        public async Task UpdatePaymentStatusAsync(int paymentId, string newStatus)
         {
-            await _paymentRepository.UpdatePaymentAsync(payment);
+            var payment = await _paymentRepository.GetPaymentByIdAsync(paymentId);
+            if (payment != null)
+            {
+                payment.Status = newStatus; // Set the new status
+                await _paymentRepository.UpdatePaymentAsync(payment); // Save the changes
+            }
         }
 
         public async Task DeletePaymentAsync(int paymentId)
         {
             await _paymentRepository.DeletePaymentAsync(paymentId);
         }
+        public async Task<Payment> GetPaymentByOrderIdAsync(int orderId)
+        {
+            return await _paymentRepository.GetPaymentByOrderIdAsync(orderId);   
+        }
+
     }
 }

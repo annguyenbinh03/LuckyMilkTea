@@ -12,7 +12,8 @@ namespace PRN222.MilkTeaShop.Service.Services.Interface
         Task<Payment> GetPaymentByIdAsync(int paymentId);
         Task<IEnumerable<Payment>> GetAllPaymentsAsync();
         Task CreatePaymentAsync(Payment payment);
-        Task UpdatePaymentAsync(Payment payment);
+        Task UpdatePaymentStatusAsync(int paymentId, string newStatus);
         Task DeletePaymentAsync(int paymentId);
+        Task<Payment> GetPaymentByOrderIdAsync(int orderId);
     }
 }

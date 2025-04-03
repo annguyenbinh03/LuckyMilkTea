@@ -1,0 +1,53 @@
+﻿@page
+@model PRN222.MilkTeaShop.Staff.Pages.Payments.IndexModel
+
+@{
+    Layout = "_Layout";  // Sử dụng layout đã tạo ở trên
+}
+
+
+<h2>Danh sách thanh toán</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Đơn hàng</th>
+            <th>Số tiền</th>
+            <th>Phương thức thanh toán</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var payment in Model.Payments)
+        {
+            <tr>
+                <td>@payment.Id</td>
+                <td>@payment.OrderId</td>
+                <td>@payment.Amount.ToString("C")</td>
+                <td>@payment.PaymentMethod.Name</td>
+                <td>@payment.Status</td>
+                <td>@(payment.CreatedAt.HasValue ? payment.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") : "Unknown")</td>
+                <td>
+                    <form method="post" asp-page-handler="UpdateStatus" class="d-inline">
+                        <input type="hidden" name="paymentId" value="@payment.Id" />
+                        <select name="newStatus" class="form-control form-control-sm" required>
+                            <option value="Completed">Completed</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                        <button type="submit" class="btn btn-warning btn-sm"
+                        @(payment.Status == "Completed" || payment.Status == "Failed" ? "disabled" : "")>
+                            Cập nhật
+                        </button>
+                    </form>
+
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-page="./Create" class="btn btn-success">Thêm thanh toán mới</a>

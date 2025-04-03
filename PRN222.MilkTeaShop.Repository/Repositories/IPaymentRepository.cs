@@ -14,5 +14,6 @@ namespace PRN222.MilkTeaShop.Repository.Repositories
         Task AddPaymentAsync(Payment payment);
         Task UpdatePaymentAsync(Payment payment);
         Task DeletePaymentAsync(int paymentId);
+        Task<Payment?> GetPaymentByOrderIdAsync(int orderId);
     }
 }

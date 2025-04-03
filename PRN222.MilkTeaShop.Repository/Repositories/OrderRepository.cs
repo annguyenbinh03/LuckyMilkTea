@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using PRN222.MilkTeaShop.Repository.DbContexts;
 using PRN222.MilkTeaShop.Repository.Models;
 
 namespace PRN222.MilkTeaShop.Repository.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
-        private readonly DbContext _context;
+        private readonly MilkTeaDBContext _context;
 
-        public OrderRepository(DbContext context)
+        public OrderRepository(MilkTeaDBContext context)
         {
             _context = context;
         }

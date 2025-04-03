@@ -50,13 +50,6 @@ namespace PRN222.MilkTeaShop.Staff.Pages.Payments
                 return Page();
             }
             Console.WriteLine(OrderId);
-            // Kiểm tra xem OrderId có hợp lệ không
-            var order = await _orderService.GetOrderByIdAsync(OrderId);
-            //if (order == null)
-            //{
-            //    ModelState.AddModelError(string.Empty, "Order not found.");
-            //    return Page();
-            //}
 
             await _paymentService.CreatePaymentAsync(Payment);
             return RedirectToPage("/Orders/Index");
