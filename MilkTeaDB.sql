@@ -135,28 +135,28 @@ GO
 INSERT INTO Size (Name) VALUES ('S'), ('M'), ('L');
 
 -- Thêm dữ liệu mẫu vào bảng Product
-INSERT INTO Product (Name, Description, Price, CategoryId, ImageUrl, Status)
+INSERT INTO Product (Name, Description, Price, CategoryId, ImageUrl, Status, SoldCount)
 VALUES 
-(N'Trà sữa truyền thống', N'Trà sữa nguyên bản', NULL, 1, 'https://toigingiuvedep.vn/wp-content/uploads/2021/06/hinh-anh-tra-sua-dep-ngon.jpeg', 'active'),
-(N'Trà sữa matcha', N'Trà sữa hương vị matcha', NULL, 1, 'https://cf.shopee.vn/file/115b108e80bd3d48179938d1248ac30b', 'active'),
-(N'Trà sữa khoai môn', N'Trà sữa vị khoai môn', NULL, 1, 'https://th.bing.com/th/id/OIP.WqrCdDU4dwF5q-Dz6D5M2QHaHa?rs=1&pid=ImgDetMain', 'active'),
-(N'Trà sữa socola', N'Trà sữa vị socola', NULL, 1, 'https://th.bing.com/th/id/OIP.l3isdgVDMi6k8rKCdXd02QHaHa?rs=1&pid=ImgDetMain', 'active'),
-(N'Trà sữa dâu', N'Trà sữa vị dâu', NULL, 1, 'https://png.pngtree.com/png-clipart/20210912/original/pngtree-strawberry-pearl-milk-tea-png-image_6742466.jpg', 'active'),
-(N'Trà sữa Thái xanh', N'Trà sữa Thái xanh có màu xanh đặc trưng, vị trà đậm và béo ngậy, kết hợp hoàn hảo giữa sữa và trà.', NULL, 1, 'https://phunuketnoi.com/wp-content/uploads/2021/11/tra-thai-xanh-45645544.jpg', 'active'),
-(N'Hồng trà tắc mật ong', N'Hồng trà kết hợp cùng vị chua nhẹ của tắc và độ ngọt thanh của mật ong, tạo nên thức uống giải khát tươi mát.', NULL, 1, 'https://blog.tiemphonui.com/wp-content/uploads/2022/05/tra-tac-mat-ong-giai-nhiet.jpg', 'active'),
-(N'Trà mãng cầu', N'Trà mãng cầu kết hợp giữa vị chua ngọt tự nhiên của mãng cầu với vị thanh mát của trà, mang lại cảm giác sảng khoái.', NULL, 1, 'https://th.bing.com/th/id/OIP.OeyB3Hr4As_Qk_PteLFt9gHaHa?rs=1&pid=ImgDetMain', 'active'),
+(N'Trà sữa truyền thống', N'Trà sữa nguyên bản', NULL, 1, 'https://toigingiuvedep.vn/wp-content/uploads/2021/06/hinh-anh-tra-sua-dep-ngon.jpeg', 'active', 1),
+(N'Trà sữa matcha', N'Trà sữa hương vị matcha', NULL, 1, 'https://cf.shopee.vn/file/115b108e80bd3d48179938d1248ac30b', 'active', 2),
+(N'Trà sữa khoai môn', N'Trà sữa vị khoai môn', NULL, 1, 'https://th.bing.com/th/id/OIP.WqrCdDU4dwF5q-Dz6D5M2QHaHa?rs=1&pid=ImgDetMain', 'active', 2),
+(N'Trà sữa socola', N'Trà sữa vị socola', NULL, 1, 'https://th.bing.com/th/id/OIP.l3isdgVDMi6k8rKCdXd02QHaHa?rs=1&pid=ImgDetMain', 'active', 1),
+(N'Trà sữa dâu', N'Trà sữa vị dâu', NULL, 1, 'https://png.pngtree.com/png-clipart/20210912/original/pngtree-strawberry-pearl-milk-tea-png-image_6742466.jpg', 'active', 2),
+(N'Trà sữa Thái xanh', N'Trà sữa Thái xanh có màu xanh đặc trưng, vị trà đậm và béo ngậy, kết hợp hoàn hảo giữa sữa và trà.', NULL, 1, 'https://phunuketnoi.com/wp-content/uploads/2021/11/tra-thai-xanh-45645544.jpg', 'active', 3),
+(N'Hồng trà tắc mật ong', N'Hồng trà kết hợp cùng vị chua nhẹ của tắc và độ ngọt thanh của mật ong, tạo nên thức uống giải khát tươi mát.', NULL, 1, 'https://blog.tiemphonui.com/wp-content/uploads/2022/05/tra-tac-mat-ong-giai-nhiet.jpg', 'active', 1),
+(N'Trà mãng cầu', N'Trà mãng cầu kết hợp giữa vị chua ngọt tự nhiên của mãng cầu với vị thanh mát của trà, mang lại cảm giác sảng khoái.', NULL, 1, 'https://th.bing.com/th/id/OIP.OeyB3Hr4As_Qk_PteLFt9gHaHa?rs=1&pid=ImgDetMain', 'active', 1),
 
-(N'Trân châu đen', N' Với cấu trúc dai ngon đặc trưng cùng độ mịn của bột nếp, trân châu đen đã trở thành một lựa chọn tuyệt vời khi kết hợp với trà sữa.', 3000, 3, 'https://th.bing.com/th/id/OIP.8pDSylnxgjbjxjWHO-wlsAHaHa?rs=1&pid=ImgDetMain', 'active'),
-(N'Trân châu trắng', N'Những viên trân châu trắng trong suốt, giòn dai, vô cùng hoàn hảo để thưởng thức cùng trà sữa.', 3000, 3, 'https://th.bing.com/th/id/R.9b8db31195f809e2ed31cf886327ca98?rik=x%2bTZx7I2QTx9HA&riu=http%3a%2f%2fcdn.shopify.com%2fs%2ffiles%2f1%2f0537%2f9997%2farticles%2fcach-lam-tran-chau-3q-tai-nha-don-gian-nhat_1_1024x1024.jpg%3fv%3d1675220873&ehk=NBQyrFv8W0T0iMxmqcVIFimNxFfYSQLKUfMyVci9VRQ%3d&risl=&pid=ImgRaw&r=0', 'active'),
-(N'Trân châu hoàng kim', N'Trân châu hoàng kim rực rỡ với sắc vàng nâu lấp lánh, kết hợp hài hòa với nước đường ngọt thanh, tạo nên một sự kết hợp đậm chất riêng.', 6000, 3, 'https://vn-test-11.slatic.net/p/c723e2cc42d44bd07a77122bdbf59b59.jpg', 'active'),
-(N'Thạch dừa', N'Thạch dừa có lớp vỏ giòn, dai với đa dạng hương vị và màu sắc hấp dẫn.', 4000, 3, 'https://th.bing.com/th/id/OIP.vLJbaj6AMrSiJrd5CNJmRwHaHV?rs=1&pid=ImgDetMain', 'active'),
-(N'Bánh flan', N'Bánh flan sẽ có vị riêng nhưng thường là béo mềm, kết cấu có tính đàn hồi tốt và thơm mùi matcha, trứng gà hoặc caramel.', 5000, 3, 'https://th.bing.com/th/id/OIP.qCtmYbQFsm3Plju9WqXLpgHaHa?w=600&h=600&rs=1&pid=ImgDetMain', 'active'),
-(N'Milk foam', N'Milk foam là lớp kem sữa béo ngậy có màu trắng muốt được thêm bên trên bề mặt của trà sữa để tăng thêm độ ngon cho thức uống.', 3000, 3, 'https://th.bing.com/th/id/OIP.WeLQhOjqGOTtPcwwBNAISgHaHa?rs=1&pid=ImgDetMain', 'active'),
+(N'Trân châu đen', N' Với cấu trúc dai ngon đặc trưng cùng độ mịn của bột nếp, trân châu đen đã trở thành một lựa chọn tuyệt vời khi kết hợp với trà sữa.', 3000, 3, 'https://th.bing.com/th/id/OIP.8pDSylnxgjbjxjWHO-wlsAHaHa?rs=1&pid=ImgDetMain', 'active', 1),
+(N'Trân châu trắng', N'Những viên trân châu trắng trong suốt, giòn dai, vô cùng hoàn hảo để thưởng thức cùng trà sữa.', 3000, 3, 'https://th.bing.com/th/id/R.9b8db31195f809e2ed31cf886327ca98?rik=x%2bTZx7I2QTx9HA&riu=http%3a%2f%2fcdn.shopify.com%2fs%2ffiles%2f1%2f0537%2f9997%2farticles%2fcach-lam-tran-chau-3q-tai-nha-don-gian-nhat_1_1024x1024.jpg%3fv%3d1675220873&ehk=NBQyrFv8W0T0iMxmqcVIFimNxFfYSQLKUfMyVci9VRQ%3d&risl=&pid=ImgRaw&r=0', 'active', 1),
+(N'Trân châu hoàng kim', N'Trân châu hoàng kim rực rỡ với sắc vàng nâu lấp lánh, kết hợp hài hòa với nước đường ngọt thanh, tạo nên một sự kết hợp đậm chất riêng.', 6000, 3, 'https://vn-test-11.slatic.net/p/c723e2cc42d44bd07a77122bdbf59b59.jpg', 'active', 0),
+(N'Thạch dừa', N'Thạch dừa có lớp vỏ giòn, dai với đa dạng hương vị và màu sắc hấp dẫn.', 4000, 3, 'https://th.bing.com/th/id/OIP.vLJbaj6AMrSiJrd5CNJmRwHaHV?rs=1&pid=ImgDetMain', 'active', 0),
+(N'Bánh flan', N'Bánh flan sẽ có vị riêng nhưng thường là béo mềm, kết cấu có tính đàn hồi tốt và thơm mùi matcha, trứng gà hoặc caramel.', 5000, 3, 'https://th.bing.com/th/id/OIP.qCtmYbQFsm3Plju9WqXLpgHaHa?w=600&h=600&rs=1&pid=ImgDetMain', 'active', 0),
+(N'Milk foam', N'Milk foam là lớp kem sữa béo ngậy có màu trắng muốt được thêm bên trên bề mặt của trà sữa để tăng thêm độ ngon cho thức uống.', 3000, 3, 'https://th.bing.com/th/id/OIP.WeLQhOjqGOTtPcwwBNAISgHaHa?rs=1&pid=ImgDetMain', 'active', 0),
 
-(N'Combo Classic', N'1 Trà sữa truyền thống(M) + 1 Trà sữa matcha(M)', 65000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-8.jpg', 'active'),
-(N'Combo Socola Matcha', N'1 Trà sữa socola(S) + 1 Trà sữa matcha(S) + 2 Trân châu đen', 80000, 2, 'https://static.vecteezy.com/system/resources/thumbnails/014/435/706/small_2x/combo-offer-banner-icon-flat-design-flat-illustration-on-white-background-vector.jpg', 'active'),
-(N'Combo Thái Xanh & Mãng Cầu', N'1 Trà sữa Thái xanh(M) + 1 Trà mãng cầu(M) + 2 Trân châu trắng', 85000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-0.jpg', 'active'),
-(N'Combo Trà Sữa 3 Vị', N'1 Trà sữa khoai môn(M) + 1 Trà sữa dâu(M) + 1 Trà sữa Thái xanh(M) + 3 Thạch dừa', 120000, 2, 'https://th.bing.com/th/id/OIP.l7Pa-DvOFOHs_JJ4HN_fKAHaHa?rs=1&pid=ImgDetMain', 'active');
+(N'Combo Classic', N'1 Trà sữa truyền thống(M) + 1 Trà sữa matcha(M)', 65000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-8.jpg', 'active', 0),
+(N'Combo Socola Matcha', N'1 Trà sữa socola(S) + 1 Trà sữa matcha(S) + 2 Trân châu đen', 80000, 2, 'https://static.vecteezy.com/system/resources/thumbnails/014/435/706/small_2x/combo-offer-banner-icon-flat-design-flat-illustration-on-white-background-vector.jpg', 'active', 0),
+(N'Combo Thái Xanh & Mãng Cầu', N'1 Trà sữa Thái xanh(M) + 1 Trà mãng cầu(M) + 2 Trân châu trắng', 85000, 2, 'https://icon-library.com/images/combo-icon/combo-icon-0.jpg', 'active', 0),
+(N'Combo Trà Sữa 3 Vị', N'1 Trà sữa khoai môn(M) + 1 Trà sữa dâu(M) + 1 Trà sữa Thái xanh(M) + 3 Thạch dừa', 120000, 2, 'https://th.bing.com/th/id/OIP.l7Pa-DvOFOHs_JJ4HN_fKAHaHa?rs=1&pid=ImgDetMain', 'active', 0);
 GO
 
 INSERT INTO ProductSize (ProductId, SizeId, Price) VALUES
@@ -184,19 +184,35 @@ VALUES
 ('staff', '12345678','staff','09012345678', 'staff@example.com', 'active');
 GO
 
-INSERT INTO [Order] (TotalPrice, Status, CreatedAt, UpdatedAt)
-VALUES 
-(50000, 'completed', GETDATE(), GETDATE()),  
-(100000, 'completed', GETDATE(), GETDATE()), 
-(75000, 'completed', GETDATE(), GETDATE()); 
+INSERT INTO [Order] (TotalPrice, Status, CreatedAt, UpdatedAt) VALUES
+(63000, 'completed', GETDATE(), GETDATE()),  
+(75000, 'completed', DATEADD(DAY, -1, GETDATE()), DATEADD(DAY, -1, GETDATE())),  
+(82000, 'completed', DATEADD(DAY, -2, GETDATE()), DATEADD(DAY, -2, GETDATE())),  
+(54000, 'completed', DATEADD(DAY, -3, GETDATE()), DATEADD(DAY, -3, GETDATE())),  
+(98000, 'completed', DATEADD(DAY, -4, GETDATE()), DATEADD(DAY, -4, GETDATE())),  
+(72000, 'completed', DATEADD(DAY, -5, GETDATE()), DATEADD(DAY, -5, GETDATE())),  
+(89000, 'completed', DATEADD(DAY, -6, GETDATE()), DATEADD(DAY, -6, GETDATE()));  
+GO  
 
-INSERT INTO OrderDetail (OrderId, ProductId, Quantity, Price, SizeId, ParentId)
-VALUES 
+INSERT INTO OrderDetail (OrderId, ProductId, Quantity, Price, SizeId, ParentId) VALUES
 (1, 1, 1, 30000, 1, NULL),  
-(1, 4, 1, 35000, 2, NULL),
-(2, 2, 2, 35000, 1, NULL),  
-(2, 5, 1, 37000, 2, NULL),  
-(2, 9, 3, 4000, NULL, NULL), 
-(3, 5, 2, 34000, 1, NULL),  
-(3, 7, 1, 31000, 3, NULL);  
+(1, 3, 1, 33000, 2, NULL),
 
+(2, 2, 2, 35000, 1, NULL),  
+(2, 6, 1, 38000, 2, NULL),
+
+(3, 5, 1, 34000, 1, NULL),  
+(3, 8, 2, 35000, 2, NULL),
+
+(4, 4, 1, 37000, 2, NULL),  
+(4, 7, 1, 31000, 3, NULL),
+
+(5, 6, 1, 33000, 1, NULL),  
+(5, 9, 3, 4000, NULL, NULL),
+
+(6, 3, 2, 33000, 1, NULL),  
+(6, 10, 2, 3000, NULL, NULL),
+
+(7, 2, 1, 35000, 2, NULL),  
+(7, 5, 1, 34000, 3, NULL);
+GO  
