@@ -22,9 +22,17 @@ namespace PRN222.MilkTeaShop.Manager.Controllers
         }
 
         // GET: Orders
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page,
+            string? search)
         {
-            var orders = await _orderService.GetOrders();
+            int pageSize = 4;
+            int pageNumber = (page ?? 1);
+
+            var (orders, totalItems) = await _orderService.GetOrders(search, pageNumber, pageSize);
+            ViewBag.CurrentPage = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalItems = totalItems;
+            ViewBag.Search = search;
             return View(orders);
         }
 

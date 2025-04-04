@@ -46,9 +46,9 @@ namespace PRN222.MilkTeaShop.Service.Services
             await _orderRepository.DeleteOrderAsync(orderId);
         }
 
-        public async Task<IEnumerable<Order>> GetOrders()
+        public async Task<(IEnumerable<Order>, int)> GetOrders(string? search, int? page = null, int? pageSize = null)
         {
-            var (orders, totalItems) = await _unitOfWork.Order.GetAsync(includes: o => o.OrderDetails, orderBy: o => o.OrderBy(order => order.CreatedAt), descending: true);
+            var (orders, totalItems) = await _unitOfWork.Order.GetAsync(page: page, pageSize: pageSize ,includes: o => o.OrderDetails, orderBy: o => o.OrderBy(order => order.CreatedAt), descending: true);
 
             foreach (var order in orders)
             {
@@ -61,7 +61,7 @@ namespace PRN222.MilkTeaShop.Service.Services
                 }
                 order.OrderDetails = details;
             }
-            return orders;
+            return (orders, totalItems);
         }
     }
 }
