@@ -1,6 +1,118 @@
-﻿@{
+﻿@using PRN222.MilkTeaShop.Repository.Models
+@{
     Layout = "_ManagerLayout";
     ViewData["HeaderTitle"] = "Dashboard";
 }
-<h1>Dashboard</h1>
-<p>Đây là nội dung trang...</p>
+
+<div class="row mb-4 mt-3">
+    <!-- Card 1: Doanh thu hôm nay -->
+    <div class="col-md-4 px-4">
+        <div class="card bg-success text-white py-2">
+            <div class="card-body">
+                <h5 class="card-title fw-bold fs-4">Danh thu hôm nay</h5>
+                <p class="card-text fs-4" style="color: #f8f9fa;">@(((int)ViewBag.DailyRevenue).ToString("N0")) VND</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Doanh thu tháng này -->
+    <div class="col-md-4 px-4">
+        <div class="card bg-info text-white py-2">
+            <div class="card-body">
+                <h5 class="card-title fw-bold fs-4">Danh thu tháng này</h5>
+                <p class="card-text fs-4" style="color: #f8f9fa;">@(((int)ViewBag.MonthyRevenue).ToString("N0")) VND</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Doanh thu năm nay -->
+    <div class="col-md-4 px-4">
+        <div class="card bg-warning text-white py-2">
+            <div class="card-body">
+                <h5 class="card-title fw-bold fs-4">Danh thu năm nay</h5>
+                <p class="card-text fs-4" style="color: #f8f9fa;">@(((int)ViewBag.AnnualRevenue).ToString("N0")) VND</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-7">
+        <h4 class="mb-3">Doanh thu trong tuần</h4>
+        <canvas id="salesChart"></canvas>
+    </div>
+    <div class="col-md-5">
+        <h4 class="mb-3">Sản phẩm nổi bật</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Lượt Bán</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ViewBag.Products != null)
+                {
+                    var products = ViewBag.Products as List<Product>; // Giả sử sản phẩm là List<Product>
+                    int index = 1;
+                    foreach (var product in products)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td>
+                                <img src="@product.ImageUrl" alt="@product.Name" width="40" height="40" class="me-2">
+                                @product.Name
+                            </td>
+                            <td>@product.SoldCount</td>
+                        </tr>
+                        index++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+                            fetch("/api/dashboard/sales-data")
+                .then(response => response.json())
+                .then(data => {
+                    var ctx = document.getElementById('salesChart').getContext('2d');
+
+                    var salesData = {
+                        labels: data.labels,
+                        datasets: [{
+                            label: "Doanh thu",
+                            data: data.data,
+                            pointBackgroundColor: 'red',
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
+                            borderColor: 'rgba(75, 192, 192, 0.5)',
+                            borderWidth: 2,
+                                    tension: 0.3,
+                            fill: false
+                        }]
+                    };
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: salesData,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: true }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: 'Ngày' } },
+                                    y: { title: { display: true, text: 'VND' }, beginAtZero: true }
+                                    }
+                                }
+                            });
+                        })
+                        .catch(error => console.error("Error loading sales data:", error));
+                });
+    </script>
+}

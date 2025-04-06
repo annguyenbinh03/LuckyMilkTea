@@ -25,9 +25,18 @@ public class Program
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<IEmployeeService, EmployeeService>();
         builder.Services.AddScoped<IOrderService, OrderService>();
+        builder.Services.AddScoped<IDashboardService, DashboardService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<CloudinaryService>();
 
-		var app = builder.Build();
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(20);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });
+
+        var app = builder.Build();
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
@@ -46,7 +55,7 @@ public class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=Combos}/{action=Index}");
+            pattern: "{controller=Account}/{action=Login}");
 
         app.Run();
     }
